@@ -1,8 +1,7 @@
-import type React from 'react';
-import { useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 
-export function useForwardedRef<T>(ref: React.ForwardedRef<T>) {
-  const innerRef = useRef<T>(null);
+export function useForwardedRef(ref) {
+  const innerRef = useRef(null);
 
   useEffect(() => {
     if (!ref) return;
@@ -11,7 +10,7 @@ export function useForwardedRef<T>(ref: React.ForwardedRef<T>) {
     } else {
       ref.current = innerRef.current;
     }
-  });
+  }, [ref]);
 
   return innerRef;
 }
