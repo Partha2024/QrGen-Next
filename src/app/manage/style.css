@@ -1,0 +1,36 @@
+#managePage{
+    height: 100%;
+}
+
+.content{
+    height: 100%;
+}
+
+.qrModalIcon{
+    display: flex;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
+    padding-left: 10px;
+}
+
+.qrModalIcon svg{
+    cursor: pointer;
+}
+
+.editOption:hover{
+    color: white;
+    background-color: rgb(0, 0, 199);
+}
+
+.deleteOption:hover{
+    color: white;
+    background-color: rgb(199, 0, 0);
+}
+
+.loadingSpinner{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%
+}

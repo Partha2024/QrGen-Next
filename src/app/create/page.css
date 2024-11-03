@@ -1,0 +1,48 @@
+#createPage {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  /* padding-top: 40px; */
+}
+
+.createPageCard{
+  background-color: #fbfbfb;
+}
+
+.formDiv {
+  border: 2px solid gray;
+  border-radius: 5px;
+  width: 700px;
+  min-height: 550px;
+  height: auto;
+  padding: 20px;
+}
+
+.designOptions {
+  margin: 10px 0px;
+}
+
+.qrDiv{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-evenly;
+  border: 2px solid gray;
+  border-radius: 5px;
+  width: 20vw;
+  margin-left: 20px;
+  min-height: 550px;
+}
+
+.qrImage{
+  background-color: white;
+  border: 2px solid lightgrey;
+  width: 220px;
+  height: 220px;
+  padding: 25px;
+}
+
+.blur{
+  filter: blur(3px);
+}
