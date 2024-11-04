@@ -31,7 +31,7 @@ export async function POST(req) {
   try {
     let qrCodeData;
     const uniqueId = qrCodeType==="dynamic" ? new Date().getTime().toString() : null;
-    const redirectUrl = `https://your-nextjs-app.vercel.app/redirect/${uniqueId}`;
+    const redirectUrl = `https://qrgen-dun.vercel.app/redirect/${uniqueId}`;
 
     // Determine QR code data based on qrCodeType
     if (qrCodeType === "dynamic") {
@@ -48,7 +48,7 @@ export async function POST(req) {
         dark: qrCodeColor || "#000000",
         light: qrCodeBackgroundColor || "#FFFFFF",
       },
-      errorCorrectionLevel: "H",
+      errorCorrectionLevel: "M",
     };
 
     // Generate QR code image
