@@ -1,6 +1,6 @@
 "use client";
 
-import { React, useState, useEffect } from "react";
+import { React, useState, useEffect, Suspense } from "react";
 import "./page.css";
 
 import { Check, ChevronsUpDown } from "lucide-react"
@@ -55,7 +55,7 @@ const formSchema = z.object({
   }
 });
 
-function Create() {
+function CreateQRComponent() {
 
   const [qrImageSrc, setQrImageSrc] = useState("");
 
@@ -331,6 +331,14 @@ function Create() {
       )}
     </div>
     </section>
+  );
+}
+
+function Create() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <CreateQRComponent />
+    </Suspense>
   );
 }
 
