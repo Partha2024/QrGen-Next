@@ -32,7 +32,7 @@ export function DataTable({ columns, data }) {
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
+    // getPaginationRowModel: getPaginationRowModel(),
     onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
     onColumnFiltersChange: setColumnFilters,
@@ -40,6 +40,7 @@ export function DataTable({ columns, data }) {
     state: {
       sorting,
       columnFilters,
+      // pagination: { pageSize: data.length },
     },
   })
 

@@ -48,6 +48,7 @@ function Manage() {
             lastModified: formatDate(lastModifiedDate), // Format using utility function
           };
         });
+        console.log(formattedData);
         setData(formattedData);
       } catch (error) {
         console.error("Error fetching QR codes:", error);
