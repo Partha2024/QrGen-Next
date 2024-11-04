@@ -6,7 +6,7 @@ import "./style.css";
 import { columns } from "./columns";
 import { DataTable } from "./data-table";
 
-import { Icons } from "@/components/icons";
+import { LoaderCircle } from "lucide-react";
 
 function formatDate(date) {
   if (isNaN(date)) {
@@ -63,7 +63,7 @@ function Manage() {
       <div className="content">
         {loading ? (
           <div className="loadingSpinner">
-            <Icons.spinner className="mr-2 h-8 w-8 animate-spin" />
+            <LoaderCircle/>
           </div>
         ) : (
           <DataTable columns={columns} data={data} />

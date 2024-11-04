@@ -30,8 +30,10 @@
     "next-env.d.ts",
     ".next/types/**/*.ts",
     "**/*.ts",
-    "**/*.tsx"
-, "src/components/icons.jsx", "src/lib/use-forwarded-ref.jsx", "src/components/ui/color-picker.jsx"  ],
+    "**/*.tsx", 
+    "src/lib/use-forwarded-ref.jsx", 
+    "src/components/ui/color-picker.jsx"  
+  ],
   "exclude": [
     "node_modules"
   ]
