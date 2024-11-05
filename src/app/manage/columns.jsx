@@ -1,15 +1,15 @@
-"use client";
+'use client';
 
 import './style.css';
-import { MoreHorizontal, ArrowUpDown, Pencil, Trash2, Eye } from "lucide-react"
+import { MoreHorizontal, ArrowUpDown, Pencil, Trash2, Eye } from "lucide-react";
+import { useCallback } from 'react';
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -17,30 +17,42 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
-export const columns = [
+export const columns = (onDelete, onEdit) => [
   {
     id: "seeQR",
-    // accessorKey: "qrCodeImage",
-    // header: "QR Code",
-    cell: ({ row }) => {
-      // const payment = row.original
-      return (
-        <div className="w-[20px] qrModalIcon">
-          <HoverCard>
-            <HoverCardTrigger><Eye className="size-5" strokeWidth={1.5} /></HoverCardTrigger>
-            <HoverCardContent className="h-auto w-auto p-[10px]">
-                <img src={row.original.qrCodeImage} alt="QR Code" className="w-[150px] h-[150px]" />
-            </HoverCardContent>
-          </HoverCard>
-        </div>
-      )
-    },
+    cell: ({ row }) => (
+      <div className="w-[20px] qrModalIcon">
+        <HoverCard>
+          <HoverCardTrigger>
+            <Eye className="size-5" strokeWidth={1.5} />
+          </HoverCardTrigger>
+          <HoverCardContent className="h-auto w-auto p-[10px]">
+            <img src={row.original.qrCodeImage} alt="QR Code" className="w-[150px] h-[150px]" />
+          </HoverCardContent>
+        </HoverCard>
+      </div>
+    ),
   },
   {
     accessorKey: "name",
     header: ({ column }) => (
-      <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")} className="text-left w-[150px]" >
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        className="text-left w-[150px]"
+      >
         QR Code Name
         <ArrowUpDown className="ml-2 h-4 w-4" />
       </Button>
@@ -52,28 +64,28 @@ export const columns = [
   {
     accessorKey: "experience",
     header: ({ column }) => (
-      <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")} className="w-[145px]  text-center" >
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        className="w-[145px] text-center"
+      >
         QR Experience <ArrowUpDown className="ml-2 h-4 w-4" />
       </Button>
     ),
     cell: ({ getValue }) => (
-      <div className="w-[125px] text-center">{getValue()}</div>
+      <div className="w-[125px] text-center uppercase">{getValue()}</div>
     ),
   },
   {
     accessorKey: "createdAt",
     header: ({ column }) => (
-      <Button
-        variant="ghost"
-        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        className="w-[160px] text-center"
-      >
+      <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")} className="w-[160px] text-center">
         Date of Creation
         <ArrowUpDown className="ml-2 h-4 w-4" />
       </Button>
     ),
     cell: ({ getValue }) => (
-      <div className="w-[145px] text-center ">{getValue()}</div>
+      <div className="w-[145px] text-center">{getValue()}</div>
     ),
   },
   {
@@ -103,15 +115,31 @@ export const columns = [
               <MoreHorizontal className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem className="editOption" onClick={() => navigator.clipboard.writeText(row.original.id)}>
-              <Pencil strokeWidth={1.5} /> Edit
-            </DropdownMenuItem>
-            <DropdownMenuItem className="deleteOption">
-              <Trash2 /> Delete
-            </DropdownMenuItem>
-          </DropdownMenuContent>
+          <AlertDialog>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This action is not reversible. This will permanently delete the QR Code.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={() => onDelete(row.original.id)}>Continue</AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+              <DropdownMenuItem className="editOption cursor-pointer" onClick={() => onEdit(row.original.id)}>
+                <Pencil strokeWidth={1.5} /> Edit
+              </DropdownMenuItem>
+              <AlertDialogTrigger asChild className='w-[118px]'>
+                <DropdownMenuItem className="deleteOption cursor-pointer">
+                  <Trash2 /> Delete
+                </DropdownMenuItem>
+              </AlertDialogTrigger>
+            </DropdownMenuContent>
+            </AlertDialog>
         </DropdownMenu>
       </div>
     ),

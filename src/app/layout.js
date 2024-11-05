@@ -1,6 +1,7 @@
 import "./globals.css";
 import { AppSidebar } from "@/components/app-sidebar"
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
+import { Toaster } from "@/components/ui/sonner";
 
 export const metadata = {
   title: "QRGen",
@@ -18,6 +19,7 @@ export default function RootLayout({ children }) {
                     <main>
                         {children}
                     </main>
+                    <Toaster />
                 </SidebarProvider>
             </body>
         </html>

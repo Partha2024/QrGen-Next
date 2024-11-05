@@ -1,6 +1,7 @@
 'use client';
 import { Button } from "@/components/ui/button";
 import { Link, MessageSquareMore } from "lucide-react";
+import { toast } from "sonner";
 
 export default function Home() {
 
@@ -32,7 +33,7 @@ export default function Home() {
             </em>
             SMS
           </Button>
-        </div>
+        </div>     
       </section>
     </main>
   );

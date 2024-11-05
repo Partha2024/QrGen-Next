@@ -5,7 +5,6 @@ import QRCode from "qrcode";
 const prisma = new PrismaClient();
 
 export async function POST(req) {
-  // const { qrCodeName, qrExperience, qrCodeType, content, smsBody, isDynamic, qrCodeColor, qrCodeBackgroundColor } = await req.json();
   const {
     qrCodeName,
     qrExperience,
@@ -30,7 +29,7 @@ export async function POST(req) {
 
   try {
     let qrCodeData;
-    const uniqueId = qrCodeType==="dynamic" ? new Date().getTime().toString() : null;
+    const uniqueId = qrCodeType==="dynamic" ? new Date().getTime().toString() : "sta" + new Date().getTime().toString() + "tic";
     const redirectUrl = `https://qrgen-dun.vercel.app/api/redirect/${uniqueId}`;
 
     // Determine QR code data based on qrCodeType
@@ -38,7 +37,6 @@ export async function POST(req) {
       qrCodeData = redirectUrl;
     } else if (qrExperience === "sms") {
       qrCodeData = redirectUrl; 
-      // qrCodeData = `sms:${phoneNumber}?body=${encodeURIComponent(smsBody || "")}`;
     } else {
       qrCodeData = url.startsWith("http") ? url : `http://${url}`;
     }
