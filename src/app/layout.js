@@ -17,7 +17,7 @@ export default function RootLayout({ children }) {
                 <SidebarProvider>
                     <AppSidebar />
                     <main>
-                      <SidebarTrigger />
+                      <SidebarTrigger className="absolute"/>
                         {children}
                     </main>
                     <Toaster />

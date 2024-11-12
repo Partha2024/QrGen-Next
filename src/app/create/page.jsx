@@ -3,7 +3,7 @@
 import { React, useState, useEffect, Suspense } from "react";
 import "./page.css";
 
-import { Check, ChevronsUpDown } from "lucide-react"
+import { Check, ChevronsUpDown, LoaderCircle } from "lucide-react"
 import { useSearchParams } from "next/navigation";
 
 import { useForm } from "react-hook-form";
@@ -38,7 +38,6 @@ const formSchema = z.object({
       message: "URL is required when QR code type is URL",
     });
   }
-
   if (data.qrExperience === "sms") {
     if (!data.phoneNumber) {
       ctx.addIssue({
@@ -77,13 +76,12 @@ function CreateQRComponent() {
     // Prepare data to be sent to the API
     console.log("values", values);
     // const qrData = values.qrExperience === "url" ? values.url : `SMSTO:${values.phoneNumber}:${values.smsBody}`;
+    var uidFromUrl = "";
     const payload = {
       ...values,
       qrCodeColor,
       qrCodeBackgroundColor,
-      // qrCodeColor: qrCodeColor.slice(1),
-      // qrCodeBackgroundColor: qrCodeBackgroundColor.slice(1),
-      // data: qrData,
+      uidFromUrl,
     };
     console.log("payload", payload);
   
@@ -96,8 +94,9 @@ function CreateQRComponent() {
         body: JSON.stringify(payload),
       });
       if (response.ok) {
-        const { qrCodeUrl, generatedQrCode } = await response.json();
+        const { qrCodeUrl, generatedQrCode, identifier } = await response.json();
         console.log("QR Code generated:", qrCodeUrl);
+        window.location.href = "/edit?uid=" + identifier;
         setQrImageSrc(generatedQrCode);
       } else {
         console.error("Failed to generate QR code:", await response.text());
@@ -319,9 +318,9 @@ function CreateQRComponent() {
         ) : (
           <div className="placeholder">
               <img
-                  src="https://api.qrserver.com/v1/create-qr-code/?size=170x170&data=Placeholder"
+                  src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=Placeholder"
                   alt="Placeholder QR Code"
-                  className="w-full h-auto blur" // You can add a blur class for a blurred effect
+                  className="w-full h-auto blur p-[20px]"
               />
           </div>
         )}
@@ -336,7 +335,7 @@ function CreateQRComponent() {
 
 function Create() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<div><LoaderCircle className="loadingSpinner mx-auto" /></div>}>
       <CreateQRComponent />
     </Suspense>
   );

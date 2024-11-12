@@ -53,9 +53,10 @@ function Manage() {
   };
 
   const handleEdit = (uniqueId) => {
-    toast("Success! - "+uniqueId, {
-      description: "QR Code Edited Successfully!!",
-    })
+    // toast("Success! - "+uniqueId, {
+    //   description: "QR Code Edited Successfully!!",
+    // })
+    window.location.href = "/edit?uid=" + uniqueId;
   }
 
   const handleDelete = async (uniqueId) => {
@@ -84,7 +85,7 @@ function Manage() {
   return (
     <div className="h-full">
       {loading ? (
-        <LoaderCircle className="mx-auto mt-8" />
+        <LoaderCircle className="loadingSpinner mx-auto" />
       ) : (
         <DataTable columns={columns(handleDelete, handleEdit)} data={data} />
       )}

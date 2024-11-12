@@ -2,7 +2,7 @@
 
 import * as React from "react";
 
-import { Calendar, Home, Inbox, Search, Settings, Plus, ChartNoAxesGantt, ChartArea, User2, ChevronDown, ChevronUp} from "lucide-react";
+import { Calendar, Home, Inbox, Search, Settings, Plus, ChartNoAxesGantt, ChartArea, User2, ChevronDown, ChevronUp, Pencil} from "lucide-react";
 import {
   SidebarHeader,
   Sidebar,

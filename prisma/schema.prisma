@@ -18,7 +18,7 @@ model QRCode {
   content_url            String?
   content_phone_number    String?
   content_sms_body        String?
-  qr_url                 String    @unique
+  qr_url                 String
   qr_image               String?
   createdAt              DateTime @default(now())
   updatedAt              DateTime @updatedAt

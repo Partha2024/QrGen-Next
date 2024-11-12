@@ -1,7 +1,6 @@
 'use client';
 import { Button } from "@/components/ui/button";
 import { Link, MessageSquareMore } from "lucide-react";
-import { toast } from "sonner";
 
 export default function Home() {
 

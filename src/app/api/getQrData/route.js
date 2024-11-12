@@ -3,13 +3,26 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-export async function GET() {
+export async function GET(req) {
   try {
-    const qrcodes = await prisma.qRCode.findMany();
+    const { searchParams } = new URL(req.url);
+    const uid = searchParams.get("uid");
+    console.log("🚀 ~ GET ~ uid:", uid)
+    let qrcodes;
+    if (uid) {
+      qrcodes = await prisma.qRCode.findUnique({
+        where: { unique_id : uid }
+      });
+      if (!qrcodes) {
+        return NextResponse.json({ error: "QR code not found" }, { status: 404 });
+      }
+    } else {
+      qrcodes = await prisma.qRCode.findMany();
+    }
     return NextResponse.json(qrcodes);
   } catch (error) {
     console.error(error);
-    return NextResponse.json({ error: 'Error fetching QR codes' }, { status: 500 });
+    return NextResponse.json({ error: "Error fetching QR codes" }, { status: 500 });
   } finally {
     await prisma.$disconnect();
   }
