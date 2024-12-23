@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { NextResponse } from 'next/server';
-import geoip from 'geoip-lite';
+// import geoip from 'geoip-lite';
 import useragent from 'useragent';
 
 const prisma = new PrismaClient();
@@ -48,11 +48,15 @@ export async function GET(req, { params }) {
 
         if(qrCode.qr_code_type === 'dynamic') {
           const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;  
-          const geo = geoip.lookup(ip);
+          // const geo = geoip.lookup(ip);
 
-          const scan_country = geo?.country || 'Unknown';
-          const scan_state = geo?.region || 'Unknown';
-          const scan_city = geo?.city || 'Unknown';
+          // const scan_country = geo?.country || 'Unknown';
+          // const scan_state = geo?.region || 'Unknown';
+          // const scan_city = geo?.city || 'Unknown';
+
+          const scan_country = 'Unknown';
+          const scan_state = 'Unknown';
+          const scan_city = 'Unknown';
 
           const userAgent = req.headers['user-agent'];
           const agent = useragent.parse(userAgent);
