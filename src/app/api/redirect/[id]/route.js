@@ -20,6 +20,8 @@ export async function GET(req, { params }) {
 
         let qrCodeDetails;
 
+        console.log(qrCode.qr_experience);
+
         if (qrCode.qr_experience === 'url') {
             // Fetch content_url if qr_experience is 'url'
             qrCodeDetails = await prisma.qRCode.findUnique({
