@@ -7,7 +7,7 @@ const prisma = new PrismaClient();
 
 export async function GET(req, { params }) {
     const { id } = await params;
-
+    var uniqueId = id;
     try {
         // Fetch the qr_experience type first
         const qrCode = await prisma.qRCode.findUnique({
@@ -20,7 +20,8 @@ export async function GET(req, { params }) {
 
         let qrCodeDetails;
 
-        console.log(qrCode.qr_experience);
+        console.log("🚀 ~ GET ~ qrCode:" , qrCode.qr_experience);
+        console.log("🚀 ~ GET ~ qrCode:" , id);
 
         if (qrCode.qr_experience === 'url') {
             // Fetch content_url if qr_experience is 'url'
@@ -38,18 +39,13 @@ export async function GET(req, { params }) {
             return NextResponse.json({ error: 'Unsupported QR Code experience type.' }, { status: 400 });
         }
 
-        if (qrCodeDetails.qr_experience === 'url') {
-            const redirectUrl = qrCodeDetails.content_url.startsWith('http://') || qrCodeDetails.content_url.startsWith('https://')
-                ? qrCodeDetails.content_url
-                : `http://${qrCodeDetails.content_url}`;
-            return NextResponse.redirect(redirectUrl);
-        } else if (qrCodeDetails.qr_experience === 'sms') {
-            const smsLink = `sms:${qrCodeDetails.content_phone_number}?body=${encodeURIComponent(qrCodeDetails.content_sms_body || '')}`;
-            return NextResponse.redirect(smsLink);
-        }
-
         if(qrCode.qr_code_type === 'dynamic') {
-          const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;  
+          console.log("🚀 ~ qr code is dynamic");
+          // const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;  
+          const ip = req.headers['x-forwarded-for'] 
+        ? req.headers['x-forwarded-for'].split(',')[0] 
+        : req.socket?.remoteAddress || "106.205.156.78";
+          console.log("🚀 ----- ip ---- ", ip);
           // const geo = geoip.lookup(ip);
 
           // const scan_country = geo?.country || 'Unknown';
@@ -66,12 +62,12 @@ export async function GET(req, { params }) {
 
           const now = new Date();
           const scan_date = now.toISOString().split('T')[0]; // Format as YYYY-MM-DD
-          const scan_time = now.toTimeString().split(' ')[0]; // Format as HH:MM:SS
+          const scan_time = now.toISOString();
 
           await prisma.qRScan.create({
             data: {
-              unique_id: req.body.id || id,
-              qr_code_name: req.body.qr_code_name || qr_code_name, // Replace with appropriate data
+              qr_unique_id: uniqueId,
+              qr_code_name: qrCode.qr_code_name, // Replace with appropriate data
               scan_date: new Date(scan_date),
               scan_time: scan_time,
               scan_country,
@@ -82,6 +78,16 @@ export async function GET(req, { params }) {
             },
           });
         }
+
+        if (qrCodeDetails.qr_experience === 'url') {
+          const redirectUrl = qrCodeDetails.content_url.startsWith('http://') || qrCodeDetails.content_url.startsWith('https://')
+              ? qrCodeDetails.content_url
+              : `http://${qrCodeDetails.content_url}`;
+          return NextResponse.redirect(redirectUrl);
+      } else if (qrCodeDetails.qr_experience === 'sms') {
+          const smsLink = `sms:${qrCodeDetails.content_phone_number}?body=${encodeURIComponent(qrCodeDetails.content_sms_body || '')}`;
+          return NextResponse.redirect(smsLink);
+      }
         res.status(200).json({ message: 'Scan recorded successfully' });
     } catch (error) {
         console.error("Error handling QR code redirect:", error);
