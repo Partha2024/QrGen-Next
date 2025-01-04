@@ -34,7 +34,8 @@ export async function GET(req, { params }) {
         }
 
         if(qrCode.qr_code_type === 'dynamic') {  
-          const ip = req.headers['x-forwarded-for'] ? req.headers['x-forwarded-for'].split(',')[0] : req.socket?.remoteAddress || "100.200.156.78";
+          // const ip = req.headers['x-forwarded-for'] ? req.headers['x-forwarded-for'].split(',')[0] : req.socket?.remoteAddress || "100.200.156.78";
+          const ip = req.headers.get("x-forwarded-for") || req.socket?.remoteAddress || "100.200.156.78";
           console.log("🚀 ----- ip ---- ", ip);
           
           // const geo = geoip.lookup(ip);
