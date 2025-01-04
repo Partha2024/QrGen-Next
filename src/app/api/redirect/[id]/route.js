@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import { NextResponse } from 'next/server';
-// import geoip from 'geoip-lite';
 import useragent from 'useragent';
+// import geoip from 'geoip-lite';
 
 const prisma = new PrismaClient();
 
@@ -9,7 +9,6 @@ export async function GET(req, { params }) {
     const { id } = await params;
     var uniqueId = id;
     try {
-        // Fetch the qr_experience type first
         const qrCode = await prisma.qRCode.findUnique({
             where: { unique_id: id },
             select: { qr_experience: true, qr_code_type: true, qr_code_name: true }
@@ -20,17 +19,12 @@ export async function GET(req, { params }) {
 
         let qrCodeDetails;
 
-        console.log("🚀 ~ GET ~ qrCode:" , qrCode.qr_experience);
-        console.log("🚀 ~ GET ~ qrCode:" , id);
-
         if (qrCode.qr_experience === 'url') {
-            // Fetch content_url if qr_experience is 'url'
             qrCodeDetails = await prisma.qRCode.findUnique({
                 where: { unique_id: id },
                 select: { qr_experience: true, content_url: true }
             });
         } else if (qrCode.qr_experience === 'sms') {
-            // Fetch content_phone_number and content_sms_body if qr_experience is 'sms'
             qrCodeDetails = await prisma.qRCode.findUnique({
                 where: { unique_id: id },
                 select: { qr_experience: true, content_phone_number: true, content_sms_body: true }
@@ -39,15 +33,11 @@ export async function GET(req, { params }) {
             return NextResponse.json({ error: 'Unsupported QR Code experience type.' }, { status: 400 });
         }
 
-        if(qrCode.qr_code_type === 'dynamic') {
-          console.log("🚀 ~ qr code is dynamic");
-          // const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;  
-          const ip = req.headers['x-forwarded-for'] 
-        ? req.headers['x-forwarded-for'].split(',')[0] 
-        : req.socket?.remoteAddress || "106.205.156.78";
+        if(qrCode.qr_code_type === 'dynamic') {  
+          const ip = req.headers['x-forwarded-for'] ? req.headers['x-forwarded-for'].split(',')[0] : req.socket?.remoteAddress || "100.200.156.78";
           console.log("🚀 ----- ip ---- ", ip);
+          
           // const geo = geoip.lookup(ip);
-
           // const scan_country = geo?.country || 'Unknown';
           // const scan_state = geo?.region || 'Unknown';
           // const scan_city = geo?.city || 'Unknown';
@@ -56,9 +46,9 @@ export async function GET(req, { params }) {
           const scan_state = 'Unknown';
           const scan_city = 'Unknown';
 
-          const userAgent = req.headers['user-agent'];
+          const userAgent = req.headers.get("user-agent");
           const agent = useragent.parse(userAgent);
-          const scan_os = agent.os.toString();
+          const scan_os = agent.os.toString().split(" ")[0]; 
 
           const now = new Date();
           const scan_date = now.toISOString().split('T')[0]; // Format as YYYY-MM-DD
@@ -67,7 +57,7 @@ export async function GET(req, { params }) {
           await prisma.qRScan.create({
             data: {
               qr_unique_id: uniqueId,
-              qr_code_name: qrCode.qr_code_name, // Replace with appropriate data
+              qr_code_name: qrCode.qr_code_name,
               scan_date: new Date(scan_date),
               scan_time: scan_time,
               scan_country,
