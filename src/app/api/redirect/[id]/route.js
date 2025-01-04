@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import { NextResponse } from 'next/server';
 import useragent from 'useragent';
-// import geoip from 'geoip-lite';
+import fetch from 'node-fetch';
 
 const prisma = new PrismaClient();
 
@@ -34,18 +34,16 @@ export async function GET(req, { params }) {
         }
 
         if(qrCode.qr_code_type === 'dynamic') {  
-          // const ip = req.headers['x-forwarded-for'] ? req.headers['x-forwarded-for'].split(',')[0] : req.socket?.remoteAddress || "100.200.156.78";
-          const ip = req.headers.get("x-forwarded-for") || req.socket?.remoteAddress || "100.200.156.78";
+          const ip = req.headers.get("x-forwarded-for") || req.socket?.remoteAddress || "100.200.300.400";
           console.log("🚀 ----- ip ---- ", ip);
-          
-          // const geo = geoip.lookup(ip);
-          // const scan_country = geo?.country || 'Unknown';
-          // const scan_state = geo?.region || 'Unknown';
-          // const scan_city = geo?.city || 'Unknown';
 
-          const scan_country = 'Unknown';
-          const scan_state = 'Unknown';
-          const scan_city = 'Unknown';
+          const response = await fetch(`http://ip-api.com/json/${ip}`);
+          const geo = await response.json();
+          console.log(geo.country);
+
+          const scan_country = geo.country || 'Unknown';
+          const scan_state = geo.regionName || 'Unknown';
+          const scan_city = geo.city || 'Unknown';
 
           const userAgent = req.headers.get("user-agent");
           const agent = useragent.parse(userAgent);
