@@ -49,6 +49,18 @@ export async function GET(req) {
     );
 
     //top 10 scanned qr codes
+    const topTenScannedQrCodes = await prisma.qRScan.groupBy({
+      by: ['qr_code_name', 'qr_unique_id'], // Group by these fields
+      _count: {
+        qr_code_name: true,
+      },
+      orderBy: {
+        _count: {
+          qr_code_name: 'desc',
+        },
+      },
+      take: 10,
+    });
 
     //top 10 qr codes with most unique users
 
@@ -64,7 +76,7 @@ export async function GET(req) {
 
     const totalUniqueUsers = distinctUsers.length;
     const averageScansPerUser = parseFloat((totalScans / totalUniqueUsers).toFixed(2));
-    return NextResponse.json({ totalQrCodes, totalScans, totalUniqueUsers, averageScansPerUser, scanTimelineData, });
+    return NextResponse.json({ totalQrCodes, totalScans, totalUniqueUsers, averageScansPerUser, scanTimelineData, topTenScannedQrCodes});
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error: "Error fetching QR codes" }, { status: 500 });

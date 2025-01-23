@@ -2,7 +2,16 @@
 
 import { React, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Area, AreaChart, CartesianGrid, XAxis, Bar, BarChart, YAxis, LabelList } from "recharts";
+import {
+  Area,
+  AreaChart,
+  CartesianGrid,
+  XAxis,
+  Bar,
+  BarChart,
+  YAxis,
+  LabelList,
+} from "recharts";
 import {
   ChartConfig,
   ChartContainer,
@@ -11,7 +20,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { format } from 'date-fns';
+import { format } from "date-fns";
 import {
   Select,
   SelectContent,
@@ -23,7 +32,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { checkPrimeSync } from "crypto";
 import { LoaderCircle } from "lucide-react";
 
-import { TrendingUp } from "lucide-react"
 import {
   Card,
   CardContent,
@@ -31,7 +39,8 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
+} from "@/components/ui/card";
+
 // import { CalendarDateRangePicker } from "./components/date-range-picker"
 // import { MainNav } from "./components/main-nav"
 // import { Overview } from "./components/overview"
@@ -65,7 +74,7 @@ const scanByTimeOfData = [
   { month: "21", scans: 1 },
   { month: "22", scans: 0 },
   { month: "23", scans: 10 },
-]
+];
 
 const chartConfig = {
   scans: {
@@ -78,7 +87,6 @@ const chartConfig = {
   },
 };
 
-
 const topTenScannedQRChartData = [
   { month: "January", scans: 1 },
   { month: "February", scans: 2 },
@@ -90,14 +98,14 @@ const topTenScannedQRChartData = [
   { month: "June", scans: 8 },
   { month: "June", scans: 9 },
   { month: "June", scans: 10 },
-]
+];
 
 const topTenScannedQRChartConfig = {
   scans: {
-    label: "scans",
+    label: "Total Scans",
     color: "hsl(var(--chart-3))",
   },
-}
+};
 
 const scansByDayOfWeekChartData = [
   { month: "Monday", scans: 1 },
@@ -107,7 +115,7 @@ const scansByDayOfWeekChartData = [
   { month: "Friday", scans: 5 },
   { month: "Saturday", scans: 6 },
   { month: "Sunday", scans: 7 },
-]
+];
 
 const scanOSData = [
   { browser: "IOS", visitors: 205, fill: "var(--color-chrome)" },
@@ -115,8 +123,7 @@ const scanOSData = [
   { browser: "Windows", visitors: 187, fill: "var(--color-firefox)" },
   { browser: "Mac OS", visitors: 173, fill: "var(--color-edge)" },
   { browser: "Linux", visitors: 90, fill: "var(--color-other)" },
-]
-
+];
 
 const scanOSConfig = {
   visitors: {
@@ -142,10 +149,9 @@ const scanOSConfig = {
     label: "Other",
     color: "hsl(var(--chart-5))",
   },
-}
+};
 
 function Analytics() {
-
   const [loading, setLoading] = useState(true);
 
   const [totalQrCodes, setTotalQrCodes] = useState([]);
@@ -153,6 +159,7 @@ function Analytics() {
   const [uniqueUsers, setUniqueUsers] = useState([]);
   const [averageScanPerUser, setAverageScanPerUser] = useState([]);
   const [scanTimeLineData, setScanTimeLineData] = useState([]);
+  const [topTenScannedQrCodes, setTopTenScannedQrCodes] = useState([]);
 
   const [timeRange, setTimeRange] = useState("90d");
 
@@ -171,13 +178,20 @@ function Analytics() {
       setUniqueUsers(result.totalUniqueUsers);
       setAverageScanPerUser(result.averageScansPerUser);
 
-      const formattedData = result.scanTimelineData.map((item) => ({
-        date: format(new Date(item.date), 'yyyy-MM-dd'),
+      const scanTimelineFormattedData = result.scanTimelineData.map((item) => ({
+        date: format(new Date(item.date), "yyyy-MM-dd"),
         scans: item.totalScans,
-        Users: item.uniqueUsers
+        Users: item.uniqueUsers,
       }));
-      setScanTimeLineData(formattedData);
+      setScanTimeLineData(scanTimelineFormattedData);
 
+      const topTenScannedQRFormattedData = result.topTenScannedQrCodes.map(
+        (item) => ({
+          qrCodeName: item.qr_code_name,
+          scans: item._count.qr_code_name,
+        })
+      );
+      setTopTenScannedQrCodes(topTenScannedQRFormattedData);
     } catch (error) {
       console.error("Error fetching QR codes:", error);
     } finally {
@@ -186,7 +200,7 @@ function Analytics() {
   };
   const filteredData = scanTimeLineData.filter((item) => {
     const date = new Date(item.date);
-    const referenceDate = new Date().toISOString().split('T')[0];
+    const referenceDate = new Date().toISOString().split("T")[0];
     let daysToSubtract = 90;
     if (timeRange === "30d") {
       daysToSubtract = 30;
@@ -226,6 +240,7 @@ function Analytics() {
                     <CardTitle className="text-sm font-medium">
                       Total QR Codes
                     </CardTitle>
+
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       viewBox="0 0 24 24"
@@ -240,7 +255,13 @@ function Analytics() {
                     </svg>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">{totalQrCodes}</div>
+                    <div className="text-2xl font-bold">
+                      {loading ? (
+                        <LoaderCircle className="loadingSpinner mx-auto" />
+                      ) : (
+                        totalQrCodes
+                      )}
+                    </div>
                   </CardContent>
                 </Card>
                 {/* total scans----------------------------------------- */}
@@ -270,9 +291,9 @@ function Analytics() {
                         totalScans
                       )}
                     </div>
-                    <p className="text-xs text-muted-foreground">
+                    {/* <p className="text-xs text-muted-foreground">
                       +20.1% from last 24 hours
-                    </p>
+                    </p> */}
                   </CardContent>
                 </Card>
                 {/* total unique users----------------------------------------- */}
@@ -304,9 +325,9 @@ function Analytics() {
                         uniqueUsers
                       )}
                     </div>
-                    <p className="text-xs text-muted-foreground">
+                    {/* <p className="text-xs text-muted-foreground">
                       +180.1% from last 24 hours
-                    </p>
+                    </p> */}
                   </CardContent>
                 </Card>
                 {/* avrage scans----------------------------------------- */}
@@ -331,7 +352,11 @@ function Analytics() {
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold">
-                      {averageScanPerUser}
+                      {loading ? (
+                        <LoaderCircle className="loadingSpinner mx-auto mt-[9px]" />
+                      ) : (
+                        averageScanPerUser
+                      )}
                     </div>
                   </CardContent>
                 </Card>
@@ -371,144 +396,162 @@ function Analytics() {
                       config={chartConfig}
                       className="aspect-auto h-[250px] w-full"
                     >
-                      <AreaChart data={filteredData}>
-                        <defs>
-                          <linearGradient
-                            id="fillscans"
-                            x1="0"
-                            y1="0"
-                            x2="0"
-                            y2="1"
-                          >
-                            <stop
-                              offset="5%"
-                              stopColor="var(--color-scans)"
-                              stopOpacity={0.8}
-                            />
-                            <stop
-                              offset="95%"
-                              stopColor="var(--color-scans)"
-                              stopOpacity={0.1}
-                            />
-                          </linearGradient>
-                          <linearGradient
-                            id="fillUsers"
-                            x1="0"
-                            y1="0"
-                            x2="0"
-                            y2="1"
-                          >
-                            <stop
-                              offset="5%"
-                              stopColor="var(--color-Users)"
-                              stopOpacity={0.8}
-                            />
-                            <stop
-                              offset="95%"
-                              stopColor="var(--color-Users)"
-                              stopOpacity={0.1}
-                            />
-                          </linearGradient>
-                        </defs>
-                        <CartesianGrid vertical={false} />
-                        <XAxis
-                          dataKey="date"
-                          tickLine={false}
-                          axisLine={false}
-                          tickMargin={8}
-                          minTickGap={32}
-                          tickFormatter={(value) => {
-                            const date = new Date(value);
-                            return date.toLocaleDateString("en-US", {
-                              month: "short",
-                              day: "numeric",
-                            });
-                          }}
-                        />
-                        <ChartTooltip
-                          cursor={false}
-                          content={
-                            <ChartTooltipContent
-                              labelFormatter={(value) => {
-                                return new Date(value).toLocaleDateString(
-                                  "en-US",
-                                  {
-                                    month: "short",
-                                    day: "numeric",
-                                  }
-                                );
-                              }}
-                              indicator="dot"
-                            />
-                          }
-                        />
-                        <Area
-                          dataKey="scans"
-                          type="natural"
-                          fill="url(#fillscans)"
-                          stroke="var(--color-scans)"
-                          stackId="b"
-                        />
-                        <Area
-                          dataKey="Users"
-                          type="natural"
-                          fill="url(#fillUsers)"
-                          stroke="var(--color-Users)"
-                        />
-                        <ChartLegend content={<ChartLegendContent />} />
-                      </AreaChart>
+                      {loading ? (
+                        <LoaderCircle className="loadingSpinner mx-auto w-6" />
+                      ) : (
+                        <AreaChart data={filteredData}>
+                          <defs>
+                            <linearGradient
+                              id="fillscans"
+                              x1="0"
+                              y1="0"
+                              x2="0"
+                              y2="1"
+                            >
+                              <stop
+                                offset="5%"
+                                stopColor="var(--color-scans)"
+                                stopOpacity={0.8}
+                              />
+                              <stop
+                                offset="95%"
+                                stopColor="var(--color-scans)"
+                                stopOpacity={0.1}
+                              />
+                            </linearGradient>
+                            <linearGradient
+                              id="fillUsers"
+                              x1="0"
+                              y1="0"
+                              x2="0"
+                              y2="1"
+                            >
+                              <stop
+                                offset="5%"
+                                stopColor="var(--color-Users)"
+                                stopOpacity={0.8}
+                              />
+                              <stop
+                                offset="95%"
+                                stopColor="var(--color-Users)"
+                                stopOpacity={0.1}
+                              />
+                            </linearGradient>
+                          </defs>
+                          <CartesianGrid vertical={false} />
+                          <XAxis
+                            dataKey="date"
+                            tickLine={false}
+                            axisLine={false}
+                            tickMargin={8}
+                            minTickGap={32}
+                            tickFormatter={(value) => {
+                              const date = new Date(value);
+                              return date.toLocaleDateString("en-US", {
+                                month: "short",
+                                day: "numeric",
+                              });
+                            }}
+                          />
+                          <ChartTooltip
+                            cursor={false}
+                            content={
+                              <ChartTooltipContent
+                                labelFormatter={(value) => {
+                                  return new Date(value).toLocaleDateString(
+                                    "en-US",
+                                    {
+                                      month: "short",
+                                      day: "numeric",
+                                    }
+                                  );
+                                }}
+                                indicator="dot"
+                              />
+                            }
+                          />
+                          <Area
+                            dataKey="scans"
+                            type="natural"
+                            fill="url(#fillscans)"
+                            stroke="var(--color-scans)"
+                            stackId="b"
+                          />
+                          <Area
+                            dataKey="Users"
+                            type="natural"
+                            fill="url(#fillUsers)"
+                            stroke="var(--color-Users)"
+                          />
+                          <ChartLegend content={<ChartLegendContent />} />
+                        </AreaChart>
+                      )}
                     </ChartContainer>
                   </CardContent>
                 </Card>
               </div>
               {/* top 10 cards div ------------------------------------------------------------------------ */}
               <div className="min-h-screen grid gap-4 grid-cols-1 md:grid-cols-2">
+                {/* top 10 scanned qr codes ------------------------------ */}
                 <Card className="h-[310px] col-span-1">
                   <CardHeader className="pl-6 pt-4 pb-4">
                     <CardTitle>Top 10 Scanned QR Codes</CardTitle>
                   </CardHeader>
                   <CardContent className="pb-0">
-                    <ChartContainer config={topTenScannedQRChartConfig} className=" min-h-[200px] h-[245px] w-full">
-                      <BarChart
-                        accessibilityLayer
-                        data={topTenScannedQRChartData}
-                        layout="vertical"
-                        margin={{
-                          left: -20,
-                        }}
-                      >
-                        <XAxis type="number" dataKey="scans" hide />
-                        <YAxis
-                          dataKey="month"
-                          type="category"
-                          tickLine={false}
-                          tickMargin={10}
-                          axisLine={false}
-                          tickFormatter={(value) => value.slice(0, 3)}
-                        />
-                        <ChartTooltip
-                          cursor={false}
-                          content={<ChartTooltipContent hideLabel />}
-                        />
-                        <Bar dataKey="scans" fill="var(--color-scans)" radius={5} >
-                          <LabelList
-                            position="right"
-                            offset={12}
-                            className="fill-foreground"
-                            fontSize={12}
+                    <ChartContainer
+                      config={topTenScannedQRChartConfig}
+                      className=" min-h-[200px] h-[245px] w-full"
+                    >
+                      {loading ? (
+                        <LoaderCircle className="loadingSpinner mx-auto my-auto w-6" />
+                      ) : (
+                        <BarChart
+                          accessibilityLayer
+                          data={topTenScannedQrCodes}
+                          layout="vertical"
+                          margin={{
+                            left: -20,
+                          }}
+                        >
+                          <XAxis type="number" dataKey="scans" hide />
+                          <YAxis
+                            dataKey="qrCodeName"
+                            type="category"
+                            tickLine={false}
+                            tickMargin={10}
+                            axisLine={false}
+                            tickFormatter={(value) => value.slice(0, 3)}
                           />
-                        </Bar>
-                      </BarChart>
+                          <ChartTooltip
+                            cursor={false}
+                            content={<ChartTooltipContent />}
+                          />
+                          <Bar
+                            dataKey="scans"
+                            fill="var(--color-scans)"
+                            radius={5}
+                          >
+                            <LabelList
+                              position="right"
+                              offset={12}
+                              className="fill-foreground"
+                              fontSize={12}
+                              />
+                          </Bar>
+                        </BarChart>
+                      )}
                     </ChartContainer>
                   </CardContent>
                 </Card>
                 <Card className="h-[310px] col-span-1">
                   <CardHeader className="pl-6 pt-4 pb-4">
-                    <CardTitle>
-                      Top 10 QR Codes By Unique Users</CardTitle>
+                    <CardTitle>Top 10 QR Codes By Unique Users</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <ChartContainer config={topTenScannedQRChartConfig} className="min-h-[200px] h-[245px]">
+                    <ChartContainer
+                      config={topTenScannedQRChartConfig}
+                      className="min-h-[200px] h-[245px]"
+                    >
                       <BarChart
                         accessibilityLayer
                         data={topTenScannedQRChartData}
@@ -530,7 +573,12 @@ function Analytics() {
                           cursor={false}
                           content={<ChartTooltipContent hideLabel />}
                         />
-                        <Bar dataKey="scans" fill="var(--color-scans)" radius={5} height={20} >
+                        <Bar
+                          dataKey="scans"
+                          fill="var(--color-scans)"
+                          radius={5}
+                          height={20}
+                        >
                           <LabelList
                             position="right"
                             offset={12}
@@ -547,7 +595,10 @@ function Analytics() {
                     <CardTitle>Scan by Time of Day</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <ChartContainer config={topTenScannedQRChartConfig} className="min-h-[200px] h-[250px] w-full">
+                    <ChartContainer
+                      config={topTenScannedQRChartConfig}
+                      className="min-h-[200px] h-[250px] w-full"
+                    >
                       <BarChart
                         accessibilityLayer
                         data={scanByTimeOfData}
@@ -567,7 +618,11 @@ function Analytics() {
                           cursor={false}
                           content={<ChartTooltipContent hideLabel />}
                         />
-                        <Bar dataKey="scans" fill="var(--color-scans)" radius={5}>
+                        <Bar
+                          dataKey="scans"
+                          fill="var(--color-scans)"
+                          radius={5}
+                        >
                           <LabelList
                             position="top"
                             offset={12}
@@ -579,12 +634,15 @@ function Analytics() {
                     </ChartContainer>
                   </CardContent>
                 </Card>
-              <Card className="h-[265px]">
+                <Card className="h-[265px]">
                   <CardHeader className="pl-6 pt-4 pb-4">
                     <CardTitle>Scans by Day of Week</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <ChartContainer config={topTenScannedQRChartConfig} className="min-h-[200px] h-[200px]">
+                    <ChartContainer
+                      config={topTenScannedQRChartConfig}
+                      className="min-h-[200px] h-[200px]"
+                    >
                       <BarChart
                         accessibilityLayer
                         data={scansByDayOfWeekChartData}
@@ -606,8 +664,12 @@ function Analytics() {
                           cursor={false}
                           content={<ChartTooltipContent hideLabel />}
                         />
-                        <Bar dataKey="scans" fill="var(--color-scans)" radius={5}>
-                        <LabelList
+                        <Bar
+                          dataKey="scans"
+                          fill="var(--color-scans)"
+                          radius={5}
+                        >
+                          <LabelList
                             position="right"
                             offset={12}
                             className="fill-foreground"
@@ -620,44 +682,51 @@ function Analytics() {
                 </Card>
                 <Card className="h-[265px]">
                   <CardHeader className="pl-6 pt-4 pb-4">
-                      <CardTitle>Scans by Operating System</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <ChartContainer config={scanOSConfig} className="min-h-[200px] h-[200px]">
-                        <BarChart
-                          accessibilityLayer
-                          data={scanOSData}
-                          layout="vertical"
-                          margin={{
-                            left: 5,
-                          }}
-                        >
-                          <YAxis
-                            dataKey="browser"
-                            type="category"
-                            tickLine={false}
-                            tickMargin={10}
-                            axisLine={false}
-                            tickFormatter={(value) => value}
-
+                    <CardTitle>Scans by Operating System</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <ChartContainer
+                      config={scanOSConfig}
+                      className="min-h-[200px] h-[200px]"
+                    >
+                      <BarChart
+                        accessibilityLayer
+                        data={scanOSData}
+                        layout="vertical"
+                        margin={{
+                          left: 5,
+                        }}
+                      >
+                        <YAxis
+                          dataKey="browser"
+                          type="category"
+                          tickLine={false}
+                          tickMargin={10}
+                          axisLine={false}
+                          tickFormatter={(value) => value}
+                        />
+                        <XAxis
+                          dataKey="visitors"
+                          type="number"
+                          hide
+                          className="w-[80%]"
+                        />
+                        <ChartTooltip
+                          cursor={false}
+                          content={<ChartTooltipContent hideLabel />}
+                        />
+                        <Bar dataKey="visitors" layout="vertical" radius={5}>
+                          <LabelList
+                            position="right"
+                            offset={12}
+                            className="fill-foreground"
+                            fontSize={12}
                           />
-                          <XAxis dataKey="visitors" type="number" hide className="w-[80%]" />
-                          <ChartTooltip
-                            cursor={false}
-                            content={<ChartTooltipContent hideLabel />}
-                          />
-                          <Bar dataKey="visitors" layout="vertical" radius={5}>
-                            <LabelList
-                              position="right"
-                              offset={12}
-                              className="fill-foreground"
-                              fontSize={12}
-                            />
-                          </Bar>
-                        </BarChart>
-                      </ChartContainer>
-                    </CardContent>
-                  </Card>
+                        </Bar>
+                      </BarChart>
+                    </ChartContainer>
+                  </CardContent>
+                </Card>
               </div>
             </TabsContent>
           </Tabs>

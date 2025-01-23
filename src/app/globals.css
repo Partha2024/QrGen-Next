@@ -90,6 +90,20 @@ main{
 }
 
 /* ---------------------------------------------- */
+@keyframes loading {
+  0% {
+    transform: rotate(-360deg);
+  }
+}
+
+.loadingSpinner{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  animation: loading 2s linear infinite;
+}
+
 .qr_options {
     display: flex;
 }
