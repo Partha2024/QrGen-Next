@@ -67,28 +67,28 @@ const chartConfig = {
 const topTenScannedQRChartConfig = {
   scans: {
     label: "Total Scans",
-    color: "hsl(var(--chart-3))",
+    color: "#215fc0",
   },
 };
 
 const topTenQRByUniqueUsersChartConfig = {
   unique_users: {
     label: "Total Unique Users",
-    color: "hsl(var(--chart-3))",
+    color: "#215fc0",
   },
 };
 
 const scanByTimeOfDayConfig = {
   totalScans: {
     label: "Total Scans",
-    color: "hsl(var(--chart-3))",
+    color: "#215fc0",
   },
 };
 
 const scanByDayOfWeekConfig = {
   totalScans: {
     label: "Total Scans",
-    color: "hsl(var(--chart-3))",
+    color: "#215fc0",
   },
 };
 
@@ -556,10 +556,10 @@ function Analytics() {
               <div className="min-h-screen grid gap-4 md:grid-cols-2">
                 {/* top 10 scanned qr codes ------------------------------ */}
                 <Card className="h-[310px] col-span-1">
-                  <CardHeader className="pl-6 pt-4 pb-4">
+                  <CardHeader className="pl-4 pt-4 pb-4">
                     <CardTitle>Top 10 Scanned QR Codes</CardTitle>
                   </CardHeader>
-                  <CardContent className="pb-0">
+                  <CardContent className="pb-0 pl-4">
                     <ChartContainer
                       config={topTenScannedQRChartConfig}
                       className=" min-h-[200px] h-[245px] w-full"
@@ -568,12 +568,11 @@ function Analytics() {
                         <LoaderCircle className="loadingSpinner mx-auto my-auto w-6" />
                       ) : (
                         <BarChart
-                          className=""
                           accessibilityLayer
                           data={topTenScannedQrCodes}
                           layout="vertical"
                           margin={{
-                            left: -20,
+                            left: -50,
                           }}
                         >
                           <XAxis type="number" dataKey="scans" hide />
@@ -581,9 +580,9 @@ function Analytics() {
                             dataKey="qrCodeName"
                             type="category"
                             tickLine={false}
-                            tickMargin={10}
+                            tickMargin={0}
                             axisLine={false}
-                            tickFormatter={(value) => value.slice(0, 3)}
+                            width={200}
                           />
                           <ChartTooltip
                             cursor={false}
@@ -607,10 +606,10 @@ function Analytics() {
                   </CardContent>
                 </Card>
                 <Card className="h-[310px] col-span-1">
-                  <CardHeader className="pl-6 pt-4 pb-4">
+                  <CardHeader className="pl-4 pt-4 pb-4">
                     <CardTitle>Top 10 Scanned QR Codes By Unique Users</CardTitle>
                   </CardHeader>
-                  <CardContent className="pb-0">
+                  <CardContent className="pb-0 pl-4">
                     <ChartContainer
                       config={topTenQRByUniqueUsersChartConfig}
                       className=" min-h-[200px] h-[245px] w-full"
@@ -623,7 +622,7 @@ function Analytics() {
                           data={topTenQRCodesByUniqueUsers}
                           layout="vertical"
                           margin={{
-                            left: -20,
+                            left: -50,
                           }}
                         >
                           <XAxis type="number" dataKey="unique_users" hide />
@@ -631,9 +630,10 @@ function Analytics() {
                             dataKey="qrCodeName"
                             type="category"
                             tickLine={false}
-                            tickMargin={10}
+                            tickMargin={0}
                             axisLine={false}
-                            tickFormatter={(value) => value.slice(0, 3)}
+                            width={200}
+                            // tickFormatter={(value) => value.slice(0, 3)}
                           />
                           <ChartTooltip
                             cursor={false}
@@ -811,7 +811,6 @@ function Analytics() {
                 <DataTable title={"Top 10 Scanning Cities"} columns={columns} data={data}>
                 </DataTable> */}
               </div>
-              
                 <Card>
                   <CardHeader className="pl-6 pt-4 pb-4">
                     <CardTitle>Top Scanned QR Codes</CardTitle>

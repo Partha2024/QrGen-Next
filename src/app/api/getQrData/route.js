@@ -17,7 +17,11 @@ export async function GET(req) {
         return NextResponse.json({ error: "QR code not found" }, { status: 404 });
       }
     } else {
-      qrcodes = await prisma.qRCode.findMany();
+      qrcodes = await prisma.qRCode.findMany({
+        orderBy: {
+          createdAt: "desc",
+        },
+      });
     }
     return NextResponse.json(qrcodes);
   } catch (error) {

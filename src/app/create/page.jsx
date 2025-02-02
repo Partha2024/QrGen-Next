@@ -1,9 +1,9 @@
 "use client";
 
-import { React, useState, useEffect, Suspense } from "react";
+import { React, useState, useEffect, Suspense, useRef } from "react";
 import "./page.css";
 
-import { Check, ChevronsUpDown, LoaderCircle } from "lucide-react"
+import { Check, ChevronsUpDown, LoaderCircle, Trash2 } from "lucide-react"
 import { useSearchParams } from "next/navigation";
 
 import { useForm } from "react-hook-form";
@@ -17,10 +17,11 @@ import { Popover, PopoverContent, PopoverTrigger, } from "@/components/ui/popove
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, } from "@/components/ui/command";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Separator } from "@/components/ui/separator";
-import { Label } from "@/components/ui/label";
-import { ColorPicker } from '@/components/ui/color-picker';
-
+import html2canvas from "html2canvas";
 import { cn } from "@/lib/utils"
+
+import { DesignOptions } from "@/app/create/component/designOptions"; 
+import ClientQR from "@/app/create/component/ClientQR"; 
 
 const formSchema = z.object({
   qrCodeName: z.string().min(2, {
@@ -54,9 +55,12 @@ const formSchema = z.object({
   }
 });
 
-function CreateQRComponent() {
+const qrCodeTypes = [
+  { label: "URL", value: "url" },
+  { label: "SMS", value: "sms" },
+];
 
-  const [qrImageSrc, setQrImageSrc] = useState("");
+function CreateQRComponent() {
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -67,62 +71,159 @@ function CreateQRComponent() {
       url: "",
       phoneNumber: "",
       smsBody: "",
-      qrCodeColor: "#000000",
-      qrCodeBackgroundColor: "#ffffff", 
     },
   });
+  
+  const [qrImageSrc, setQrImageSrc] = useState("");
+  const [payload, setPayload] = useState("");
+  const qrExperience = form.watch("qrExperience");
+  const qrExperienceFromURL = useSearchParams().get("qr") || "url";
+  const [designData, setDesignData] = useState({
+    width: 220,
+    height: 220,
+    type: "svg",
+    image: "",
+    data: "https://example.com",
+    margin: 10,
+    qrOptions: {
+      typeNumber: "0",
+      mode: "Byte",
+      errorCorrectionLevel: "Q"
+    },
+    imageOptions: {
+      hideBackgroundDots: true,
+      imageSize: 0.4,
+      margin: 4,
+      crossOrigin: 'anonymous',
+      saveAsBlob: true,
+    },
+    dotsOptions: {
+      type: "square",
+      color: "#000000",
+      roundSize: true
+    },
+    backgroundOptions: {
+      round: 0,
+      color: "#fff"
+    },
+    dotsOptionsHelper: {
+      colorType: {
+        single: true,
+        gradient: false
+      },
+      gradient: {
+        linear: true,
+        radial: false,
+        color1: "#6a1a4c",
+        color2: "#6a1a4c",
+        rotation: "0"
+      }
+    },
+    cornersSquareOptions: {
+      type: "square",
+      color: "#000000",
+      gradient: null
+    },
+    cornersSquareOptionsHelper: {
+      colorType: {
+        single: true,
+        gradient: false
+      },
+      gradient: {
+        linear: true,
+        radial: false,
+        color1: "#000000",
+        color2: "#000000",
+        rotation: "0"
+      }
+    },
+    cornersDotOptions: {
+      type: "",
+      color: "#000000"
+    },
+    cornersDotOptionsHelper: {
+      colorType: {
+        single: true,
+        gradient: false
+      },
+      gradient: {
+        linear: true,
+        radial: false,
+        color1: "#000000",
+        color2: "#000000",
+        rotation: "0"
+      }
+    },
+    backgroundOptionsHelper: {
+      colorType: {
+        single: true,
+        gradient: false
+      },
+      gradient: {
+        linear: true,
+        radial: false,
+        color1: "#ffffff",
+        color2: "#ffffff",
+        rotation: "0"
+      }
+    }
+  });
+
+  function handleDesignDataChange(data){
+    setDesignData(data);
+  }
 
   async function onSubmit(values) {
-    // Prepare data to be sent to the API
-    console.log("values", values);
+    // console.log("values", values);
     // const qrData = values.qrExperience === "url" ? values.url : `SMSTO:${values.phoneNumber}:${values.smsBody}`;
     var uidFromUrl = "";
-    const payload = {
-      ...values,
-      qrCodeColor,
-      qrCodeBackgroundColor,
-      uidFromUrl,
-    };
-    console.log("payload", payload);
-  
-    try {
-      const response = await fetch("/api/generateQr", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
-      if (response.ok) {
-        const { qrCodeUrl, generatedQrCode, identifier } = await response.json();
-        console.log("QR Code generated:", qrCodeUrl);
-        window.location.href = "/edit?uid=" + identifier;
-        setQrImageSrc(generatedQrCode);
-      } else {
-        console.error("Failed to generate QR code:", await response.text());
-      }
-    } catch (error) {
-      console.error("Error generating QR code:", error);
+    let uniqueId = values.qrCodeType==="dynamic" ? new Date().getTime().toString() : "sta" + new Date().getTime().toString() + "tic";
+    let redirectionUrl = `https://qrgen-prod.vercel.app/api/redirect/${uniqueId}`; //prod url
+
+    if (values.qrCodeType === "dynamic" || values.qrExperience === "sms") {
+      designData.data = redirectionUrl;
+    } else {
+      designData.data = values.url.startsWith("http") ? values.url : `http://${values.url}`;
     }
+    setPayload(designData);
+    // console.log("payload", payload);
+
+    setTimeout( async () => {
+      const canvas = await html2canvas(document.getElementById("qrImageDiv"));
+      const dataUrl = canvas.toDataURL("image/png"); // Convert to base64;
+      setQrImageSrc(dataUrl);
+      const dbData = {
+        ...values,
+        uniqueId,
+        qrCodeColor: designData.dotsOptions.color,
+        qrCodeBackgroundColor: designData.backgroundOptions.color,
+        uidFromUrl,
+        qrImage: dataUrl,
+        qrUrl: designData.data
+      };
+
+      try {
+        // const response = await fetch("/api/generateQr", {
+        const response = await fetch("/api/createQr", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(dbData),
+        });
+        if (response.ok) {
+          // console.log("QR Code generated:");
+          window.location.href = "/edit?uid=" + uniqueId;
+        } else {
+          console.error("Failed to generate QR code:", await response.text());
+        }
+      } catch (error) {
+        console.error("Error generating QR code:", error);
+      }
+
+    },100)
   }
   
-  function downloadQrCode(qrImageSrc) {
-    const link = document.createElement("a");
-    link.href = qrImageSrc;
-    link.download = qrCodeUrl+".png";
-    link.click();
-  }
-
-  const qrExperience = form.watch("qrExperience");
-  const qrCodeTypes = [
-    { label: "URL", value: "url" },
-    { label: "SMS", value: "sms" },
-  ];
-
-  const [qrCodeColor, setqrCodeColor] = useState('#000');
-  const [qrCodeBackgroundColor, setqrCodeBackgroundColor] = useState('#fff');
-
-  const qrExperienceFromURL = useSearchParams().get("qr") || "url";
   useEffect(() => {
     form.setValue("qrExperience", qrExperienceFromURL);
   }, [qrExperienceFromURL, form]);
@@ -225,29 +326,11 @@ function CreateQRComponent() {
                 </FormItem>
               )}
             />
-
-            <div className="designOptions">
-              <Label className="mt-5">Design</Label> <br/>
-              <div className="design-color flex space-x-2">
-                <Label className="mt-4 text-muted-foreground" htmlFor="terms">QR Code Color </Label>
-                <ColorPicker name="qrColor" className="mt-2 w-8 h-8 rounded-lg"
-                  onChange={(v) => {
-                    setqrCodeColor(v);
-                  }}
-                  value={qrCodeColor}
-                />
-              </div>
-              <div className="design-bg-color flex space-x-2">
-                <Label className="mt-4 text-muted-foreground" htmlFor="terms">Background Color</Label>
-                <ColorPicker name="qrBgColor" className="mt-2 w-8 h-8 rounded-lg"
-                  onChange={(v) => {
-                    setqrCodeBackgroundColor(v);
-                  }}
-                  value={qrCodeBackgroundColor}
-                />
-              </div>
-
-            </div>
+            
+            <Separator className="my-5" />  
+            
+            <DesignOptions name="qrColor" className="mt-2 w-8 h-8 rounded-lg" value={designData} onChange={handleDesignDataChange} />
+            
             <Separator className="my-5" /> 
             
             {qrExperience === "url" && (
@@ -258,10 +341,7 @@ function CreateQRComponent() {
                   <FormItem className="flex flex-col">
                     <FormLabel>URL</FormLabel>
                     <FormControl>
-                      <Input
-                        placeholder="Enter URL"
-                        {...field}
-                      />
+                      <Input placeholder="Enter URL" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -317,17 +397,10 @@ function CreateQRComponent() {
           <img src={qrImageSrc} alt="QR Code" className="w-full h-auto" />
         ) : (
           <div className="placeholder">
-              <img
-                  src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=Placeholder"
-                  alt="Placeholder QR Code"
-                  className="w-full h-auto blur p-[20px]"
-              />
+            <ClientQR options={payload}/>
           </div>
         )}
       </div>
-      {qrImageSrc && (
-        <Button className="mt-4" onClick={() => downloadQrCode(qrImageSrc)}>Download</Button>
-      )}
     </div>
     </section>
   );
