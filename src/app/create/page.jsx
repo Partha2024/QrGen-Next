@@ -5,6 +5,14 @@ import "./page.css";
 
 import { Check, ChevronsUpDown, LoaderCircle, Trash2 } from "lucide-react"
 import { useSearchParams } from "next/navigation";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
 
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -19,9 +27,9 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Separator } from "@/components/ui/separator";
 import html2canvas from "html2canvas";
 import { cn } from "@/lib/utils"
-
-import { DesignOptions } from "@/app/create/component/designOptions"; 
-import ClientQR from "@/app/create/component/ClientQR"; 
+import { toast } from "sonner"
+import { DesignOptions } from "@/app/create/component/designOptions";
+import ClientQR from "@/app/create/component/ClientQR";
 
 const formSchema = z.object({
   qrCodeName: z.string().min(2, {
@@ -73,7 +81,7 @@ function CreateQRComponent() {
       smsBody: "",
     },
   });
-  
+
   const [qrImageSrc, setQrImageSrc] = useState("");
   const [payload, setPayload] = useState("");
   const qrExperience = form.watch("qrExperience");
@@ -168,14 +176,15 @@ function CreateQRComponent() {
       }
     }
   });
+  const [onSubmitLoader, setOnSubmitLoader] = useState(false);
 
   function handleDesignDataChange(data){
     setDesignData(data);
   }
 
   async function onSubmit(values) {
+    setOnSubmitLoader(true);
     // console.log("values", values);
-    // const qrData = values.qrExperience === "url" ? values.url : `SMSTO:${values.phoneNumber}:${values.smsBody}`;
     var uidFromUrl = "";
     let uniqueId = values.qrCodeType==="dynamic" ? new Date().getTime().toString() : "sta" + new Date().getTime().toString() + "tic";
     let redirectionUrl = `https://qrgen-prod.vercel.app/api/redirect/${uniqueId}`; //prod url
@@ -213,7 +222,11 @@ function CreateQRComponent() {
         });
         if (response.ok) {
           // console.log("QR Code generated:");
+          toast("Success!!", {
+            description: "QR Code Created Successfully",
+          })
           window.location.href = "/edit?uid=" + uniqueId;
+          setOnSubmitLoader(true);
         } else {
           console.error("Failed to generate QR code:", await response.text());
         }
@@ -223,185 +236,193 @@ function CreateQRComponent() {
 
     },100)
   }
-  
+
   useEffect(() => {
     form.setValue("qrExperience", qrExperienceFromURL);
   }, [qrExperienceFromURL, form]);
 
   return (
-    <section id="createPage">
-      <div className="formDiv createPageCard">
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} 
-          // className="space-y-1"
-          >
-            <FormField control={form.control} name="qrExperience"
-              render={({ field }) => (
-                // <FormItem className="flex flex-row items-center">
-                  <FormItem className="flex flex-col mb-4">
-                  <FormLabel className="mr-1">QR Experience</FormLabel>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button variant="outline" role="combobox"
-                          className={cn(
-                            "w-[200px] justify-between",
-                            !field.value && "text-muted-foreground"
-                          )}
-                        >
-                          {field.value ? qrCodeTypes.find((qrExperience) => qrExperience.value === field.value)?.label : qrCodeTypes[0].label}
-                          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-[200px] p-0">
-                      <Command>
-                        <CommandList>
-                          <CommandGroup>
-                            {qrCodeTypes.map((qrExperience) => (
-                              <CommandItem value={qrExperience.label} key={qrExperience.value}
-                                onSelect={() => {form.setValue("qrExperience", qrExperience.value)}}
-                              >
-                                <Check
-                                  className={cn(
-                                    "mr-2 h-4 w-4",
-                                    qrExperience.value === field.value
-                                      ? "opacity-100"
-                                      : "opacity-0"
-                                  )}
-                                />
-                                {qrExperience.label}
-                              </CommandItem>
-                            ))}
-                          </CommandGroup>
-                        </CommandList>
-                      </Command>
-                    </PopoverContent>
-                  </Popover>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            
-            <FormField
-              control={form.control}
-              name="qrCodeType"
-              render={({ field }) => (
-                <FormItem className="space-y-3">
-                  {/* <FormLabel>Notify me about...</FormLabel> */}
-                  <FormControl>
-                    <RadioGroup onValueChange={field.onChange} defaultValue="dynamic" className="flex space-y-1 mb-4">
-                      <FormItem className="flex items-center space-x-3 space-y-0">
+    <section id="createPage" className="w-full flex p-6 justify-center items-center">
+      <Card className="formDiv createPageCard w-full">
+        <CardContent className="p-6 pt-4">
+          <Form {...form}  >
+            <form onSubmit={form.handleSubmit(onSubmit)}>
+            <fieldset disabled={onSubmitLoader}>
+              <FormField control={form.control} name="qrExperience"
+                render={({ field }) => (
+                  <FormItem className="flex mb-4 items-center">
+                    <FormLabel className="mr-1 mt-[4px] pr-2">QR Experience</FormLabel>
+                    <Popover>
+                      <PopoverTrigger asChild>
                         <FormControl>
-                          <RadioGroupItem value="dynamic" />
+                          <Button variant="outline" role="combobox"
+                            className={cn(
+                              "w-[200px] justify-between",
+                              !field.value && "text-muted-foreground"
+                            )}
+                          >
+                            {field.value ? qrCodeTypes.find((qrExperience) => qrExperience.value === field.value)?.label : qrCodeTypes[0].label}
+                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                          </Button>
                         </FormControl>
-                        <FormLabel> Dynamic</FormLabel>
-                      </FormItem>
-                      <FormItem className="flex items-center space-x-3 space-y-0">
-                        <FormControl>
-                          <RadioGroupItem value="static" />
-                        </FormControl>
-                        <FormLabel >Static</FormLabel>
-                      </FormItem>
-                    </RadioGroup>
-                  </FormControl>
-                </FormItem>
-              )}
-            />
+                      </PopoverTrigger>
+                      <PopoverContent className="w-[200px] p-0">
+                        <Command>
+                          <CommandList>
+                            <CommandGroup>
+                              {qrCodeTypes.map((qrExperience) => (
+                                <CommandItem value={qrExperience.label} key={qrExperience.value}
+                                  onSelect={() => {form.setValue("qrExperience", qrExperience.value)}}
+                                >
+                                  <Check
+                                    className={cn(
+                                      "mr-2 h-4 w-4",
+                                      qrExperience.value === field.value
+                                        ? "opacity-100"
+                                        : "opacity-0"
+                                    )}
+                                  />
+                                  {qrExperience.label}
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          </CommandList>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
+                  </FormItem>
+                )}
+              />
 
-            <Separator className="my-5" />  
-
-            <FormField control={form.control} name="qrCodeName"
-              render={({ field }) => (
-                // <FormItem className="flex flex-row items-center mb-2">
-                <FormItem className="flex flex-col">
-                  <FormLabel className="mr-0">QR Code Name : </FormLabel>
-                  <FormControl>
-                    <Input 
-                    // className="w-72" 
-                    // onChangeCapture={e => onChange(e.currentTarget.value)} 
-                    placeholder="Enter QR Code Name" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            
-            <Separator className="my-5" />  
-            
-            <DesignOptions name="qrColor" className="mt-2 w-8 h-8 rounded-lg" value={designData} onChange={handleDesignDataChange} />
-            
-            <Separator className="my-5" /> 
-            
-            {qrExperience === "url" && (
               <FormField
                 control={form.control}
-                name="url"
+                name="qrCodeType"
                 render={({ field }) => (
+                  <FormItem className="flex items-center">
+                    <FormLabel className="mt-[4px]">QR Code Type</FormLabel>
+                    <FormControl className="ml-4">
+                      <RadioGroup onValueChange={field.onChange} defaultValue="dynamic"
+                      className="flex mb-4 space-x-4">
+                        <FormItem className="flex items-center space-x-2 space-y-0">
+                          <FormControl>
+                            <RadioGroupItem value="dynamic" />
+                          </FormControl>
+                          <FormLabel>Dynamic</FormLabel>
+                        </FormItem>
+                        <FormItem className="flex items-center space-x-2 space-y-0">
+                          <FormControl>
+                            <RadioGroupItem value="static" />
+                          </FormControl>
+                          <FormLabel >Static</FormLabel>
+                        </FormItem>
+                      </RadioGroup>
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+
+              <Separator className="my-5" />
+
+              <FormField control={form.control} name="qrCodeName"
+                render={({ field }) => (
+                  // <FormItem className="flex flex-row items-center mb-2">
                   <FormItem className="flex flex-col">
-                    <FormLabel>URL</FormLabel>
+                    <FormLabel className="mr-0">QR Code Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter URL" {...field} />
+                      <Input
+                      // className="w-72"
+                      // onChangeCapture={e => onChange(e.currentTarget.value)}
+                      placeholder="Enter QR Code Name" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-            )}
 
-            {qrExperience === "sms" && (
-              <>
+              <Separator className="my-5" />
+
+              <DesignOptions name="qrColor" className="mt-2 w-8 h-8 rounded-lg" value={designData} onChange={handleDesignDataChange} />
+
+              <Separator className="my-5" />
+
+              {qrExperience === "url" && (
                 <FormField
                   control={form.control}
-                  name="phoneNumber"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-col mb-4">
-                      <FormLabel>Phone Number</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Enter Phone Number"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="smsBody"
+                  name="url"
                   render={({ field }) => (
                     <FormItem className="flex flex-col">
-                      <FormLabel>SMS Body</FormLabel>
+                      <FormLabel>URL</FormLabel>
                       <FormControl>
-                        <Input
-                          placeholder="Enter SMS Body"
-                          {...field}
-                        />
+                        <Input placeholder="Enter URL" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-              </>
-            )}
-            
-            <Button className="mt-4" type="submit">Generate QR</Button>
-          </form>
-        </Form>
-      </div>
-      <div className="qrDiv createPageCard">  
-      <div className="qrImage">
-      {qrImageSrc ? (
-          <img src={qrImageSrc} alt="QR Code" className="w-full h-auto" />
-        ) : (
-          <div className="placeholder">
+              )}
+
+              {qrExperience === "sms" && (
+                <>
+                  <FormField
+                    control={form.control}
+                    name="phoneNumber"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-col mb-4">
+                        <FormLabel>Phone Number</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="Enter Phone Number"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="smsBody"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-col">
+                        <FormLabel>SMS Body</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="Enter SMS Body"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </>
+              )}
+              <Button className="mt-8" type="submit" disabled={onSubmitLoader}>
+                Generate QR
+                {onSubmitLoader && <LoaderCircle className="loadingSpinner ml-1" />}
+              </Button>
+              </fieldset>
+            </form>
+          </Form>
+        </CardContent>
+        <CardFooter className="p-0">
+          <div className="hidden">
             <ClientQR options={payload}/>
           </div>
-        )}
-      </div>
-    </div>
+        </CardFooter>
+      </Card>
+      {/* <div className="qrDiv createPageCard">
+        <div className="qrImage">
+        {qrImageSrc ? (
+            <img src={qrImageSrc} alt="QR Code" className="w-full h-auto" />
+          ) : (
+            <div className="placeholder">
+              <ClientQR options={payload}/>
+            </div>
+          )}
+        </div>
+      </div> */}
     </section>
   );
 }

@@ -4,32 +4,32 @@
   }
 }
 
-#createPage {
+/* #createPage {
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100%;
-  /* padding-top: 40px; */
-}
+  padding-top: 40px;
+} */
 
-.createPageCard{
+/* .createPageCard{
   background-color: #fbfbfb;
-}
+} */
 
-.formDiv {
+/* .formDiv {
   border: 2px solid gray;
   border-radius: 5px;
   width: 700px;
   min-height: 550px;
   height: auto;
   padding: 20px;
-}
+} */
 
-.designOptions {
+/* .designOptions {
   margin: 10px 0px;
-}
+} */
 
-.qrDiv{
+/* .qrDiv{
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -39,18 +39,18 @@
   width: 20vw;
   margin-left: 20px;
   min-height: 550px;
-}
+} */
 
-.qrImage{
+/* .qrImage{
   background-color: white;
   border: 2px solid lightgrey;
   width: 220px;
   height: 220px;
-}
+} */
 
-.blur{
+/* .blur{
   filter: blur(3px);
-}
+} */
 
 .loadingSpinner{
   display: flex;
