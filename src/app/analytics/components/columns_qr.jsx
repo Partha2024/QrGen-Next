@@ -19,7 +19,7 @@ export const columns = (onDelete, onEdit) => [
       </Button>
     ),
     cell: ({ getValue }) => (
-      <div className="w-[400px] text-left pl-2">{getValue()}</div>
+      <div className="w-[600px] text-left pl-2">{getValue()}</div>
     ),
   },
   {
@@ -34,7 +34,7 @@ export const columns = (onDelete, onEdit) => [
       </Button>
     ),
     cell: ({ getValue }) => (
-      <div className="w-[125px] text-center uppercase">{getValue()}</div>
+      <div className="w-[145px] text-center uppercase">{getValue()}</div>
     ),
   },
   {
@@ -43,14 +43,14 @@ export const columns = (onDelete, onEdit) => [
       <Button
         variant="ghost"
         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        className="w-[140px] text-center"
+        className="w-[180px] text-center"
       >
         Total Unique Users
         <ArrowUpDown className="ml-2 h-4 w-4" />
       </Button>
     ),
     cell: ({ getValue }) => (
-      <div className="w-[130px] text-center">{getValue()}</div>
+      <div className="w-[180px] text-center">{getValue()}</div>
     ),
   },
 ];

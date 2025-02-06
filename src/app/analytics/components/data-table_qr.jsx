@@ -9,6 +9,7 @@ import {
   getSortedRowModel,
   useReactTable,
   getFilteredRowModel,
+  getPaginationRowModel,
 } from "@tanstack/react-table";
 import {
   Table,
@@ -19,6 +20,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button"
 
 export function DataTable({ columns, data, onDelete }) {
   const [sorting, setSorting] = React.useState([]);
@@ -32,6 +34,7 @@ export function DataTable({ columns, data, onDelete }) {
     getSortedRowModel: getSortedRowModel(),
     onColumnFiltersChange: setColumnFilters,
     getFilteredRowModel: getFilteredRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
     state: {
       sorting,
       columnFilters,
@@ -40,7 +43,8 @@ export function DataTable({ columns, data, onDelete }) {
 
   return (
     <>
-      <div className="flex items-center py-4 justify-end pr-[15px]">
+      <div className="flex items-center py-2 pt-4 pb-4 justify-end pr-[15px] relative top-[-64px] ">
+        {/* <h3 className="text-2xl font-semibold">Top Scanned QR Codes</h3> */}
         <Input
           className="max-w-sm border-slate-600"
           placeholder="Search QR Codes"
@@ -50,12 +54,13 @@ export function DataTable({ columns, data, onDelete }) {
           }
         />
       </div>
-      <Table>
-        <TableHeader>
+      <div className="relative top-[-60px]">
+      <Table className="w-full">
+        <TableHeader className="w-full">
           {table.getHeaderGroups().map(headerGroup => (
-            <TableRow key={headerGroup.id}>
+            <TableRow className="w-full" key={headerGroup.id}>
               {headerGroup.headers.map(header => (
-                <TableHead key={header.id}>
+                <TableHead className="h-2" key={header.id}>
                   {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
                 </TableHead>
               ))}
@@ -67,7 +72,7 @@ export function DataTable({ columns, data, onDelete }) {
             table.getRowModel().rows.map(row => (
               <TableRow key={row.id}>
                 {row.getVisibleCells().map(cell => (
-                  <TableCell key={cell.id}>
+                  <TableCell className="p-2" key={cell.id}>
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </TableCell>
                 ))}
@@ -82,6 +87,25 @@ export function DataTable({ columns, data, onDelete }) {
           )}
         </TableBody>
       </Table>
+      </div>
+      <div className="flex items-center justify-end space-x-2 py-0 relative">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => table.previousPage()}
+          disabled={!table.getCanPreviousPage()}
+        >
+          Previous
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => table.nextPage()}
+          disabled={!table.getCanNextPage()}
+        >
+          Next
+        </Button>
+      </div>
     </>
   );
 }

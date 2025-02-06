@@ -13,7 +13,7 @@
     "incremental": true,
     "module": "esnext",
     "esModuleInterop": true,
-    "moduleResolution": "node",
+    "moduleResolution": "Node",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
@@ -32,8 +32,8 @@
     "**/*.ts",
     "**/*.tsx", 
     "src/lib/use-forwarded-ref.jsx", 
-    "src/components/ui/color-picker.jsx"  
-  ],
+    "src/components/ui/color-picker.jsx",   
+    "src/app/edit/component/ClientQR.jsx", "src/components/autocomplete.tsx"  ],
   "exclude": [
     "node_modules"
   ]
