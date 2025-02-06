@@ -21,7 +21,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { format } from "date-fns";
+import { addDays, format } from "date-fns"
 import {
   Select,
   SelectContent,
@@ -31,8 +31,9 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { checkPrimeSync } from "crypto";
-import { LoaderCircle } from "lucide-react";
-
+import { LoaderCircle, QrCode, ScanQrCode, ListFilterPlus, ScanLine, Users, Filter, Calendar as CalendarIcon } from "lucide-react";
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import {
   Card,
   CardContent,
@@ -41,10 +42,24 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-
+import { DateRange } from "react-day-picker"
 import { Payment, columns } from "./components/columns_qr";
 import { DataTable } from "./components/data-table_qr";
-
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion"
+import { cn } from "@/lib/utils"
+import { Calendar } from "@/components/ui/calendar"
+import { AutoComplete } from "./components/autocomplete"
+// import { AutoComplete } from "@/components/autocomplete1"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
 // import { CalendarDateRangePicker } from "./components/date-range-picker"
 // import { MainNav } from "./components/main-nav"
 // import { Overview } from "./components/overview"
@@ -67,28 +82,28 @@ const chartConfig = {
 const topTenScannedQRChartConfig = {
   scans: {
     label: "Total Scans",
-    color: "hsl(var(--chart-3))",
+    color: "#215fc0",
   },
 };
 
 const topTenQRByUniqueUsersChartConfig = {
   unique_users: {
     label: "Total Unique Users",
-    color: "hsl(var(--chart-3))",
+    color: "#215fc0",
   },
 };
 
 const scanByTimeOfDayConfig = {
   totalScans: {
     label: "Total Scans",
-    color: "hsl(var(--chart-3))",
+    color: "#215fc0",
   },
 };
 
 const scanByDayOfWeekConfig = {
   totalScans: {
     label: "Total Scans",
-    color: "hsl(var(--chart-3))",
+    color: "#215fc0",
   },
 };
 
@@ -118,21 +133,17 @@ const scanOSConfig = {
   },
 };
 
-const data = [
-  {
-    id: "728ed52f",
-    amount: 100,
-    status: "pending",
-    email: "m@example.com",
-  }
-]
-
 function Analytics() {
 
   const ref = useRef(null);
-  
+
   const [loading, setLoading] = useState(true);
   const [timeRange, setTimeRange] = useState("90d");
+
+  const [qrCodesNames, setQRCodesNames] = useState({});
+  const [qrCodesCountry, setQRCodesCountry] = useState({});
+  const [qrCodesState, setQRCodesState] = useState({});
+  const [qrCodesCity, setQRCodesCity] = useState({});
 
   const [totalQrCodes, setTotalQrCodes] = useState([]);
   const [totalScans, setTotalScans] = useState([]);
@@ -145,11 +156,39 @@ function Analytics() {
   const [scansByDayOfWeek, setScanByScansDayOfWeek] = useState([]);
   const [scansByOS, setScansByOS] = useState([]);
   const [data, setData] = useState([]);
+  const [showFilters, setShowFilters] = useState(false);
+
+  const [date, setDate] = useState({})
+  const [searchValue_qr, setSearchValue_qr] = useState('');
+  const [selectedValue_qr, setSelectedValue_qr] = useState('');
+  const [searchValue_country, setSearchValue_country] = useState('');
+  const [selectedValue_country, setSelectedValue_country] = useState('');
+  const [searchValue_state, setSearchValue_state] = useState('');
+  const [selectedValue_state, setSelectedValue_state] = useState('');
+  const [searchValue_city, setSearchValue_city] = useState('');
+  const [selectedValue_city, setSelectedValue_city] = useState('');
+  const [filterApplied, setFilterApplied] = useState(true);
 
   const fetchData = async () => {
     setLoading(true);
     try {
-      const response = await fetch("./api/analytics");
+
+      const payload = {
+        dateRange: date,
+        qrCodeName: selectedValue_qr,
+        country: selectedValue_country,
+        state: selectedValue_state,
+        city: selectedValue_city,
+      };
+
+      // const response = await fetch("./api/analytics");
+      const response = await fetch("/api/analytics", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
@@ -183,7 +222,7 @@ function Analytics() {
         })
       );
       setTopTenQRCodesByUniqueUsers(topTenQRCodesByUniqueUsersFormattedData);
-      
+
       const scanByTimeOfDayFormattedData = Array.from({ length: 24 }, (_, hour) => {
         const formattedHour = hour.toString().padStart(2, '0');
         const existingData = result.scanByTimeOfDay.find(
@@ -230,15 +269,19 @@ function Analytics() {
           lastModified: qr.userCount
         };
       });
-      console.log("formattedData", formattedData);
       setData(formattedData);
 
+      setQRCodesNames(result.qrCodesNames);
+      setQRCodesCountry(result.qrCodesCountry);
+      setQRCodesState(result.qrCodesState);
+      setQRCodesCity(result.qrCodesCity);
     } catch (error) {
       console.error("Error fetching QR codes:", error);
     } finally {
       setLoading(false);
     }
   };
+
   const filteredData = scanTimeLineData.filter((item) => {
     const date = new Date(item.date);
     const referenceDate = new Date().toISOString().split("T")[0];
@@ -278,6 +321,16 @@ function Analytics() {
       })
   }, [ref])
 
+  function handleFilter() {
+    setShowFilters(!showFilters);
+  }
+
+  function handleFilterSubmit(){
+    setFilterApplied(false);
+    console.log("searchValue_qr", date, selectedValue_qr, selectedValue_country, selectedValue_state, selectedValue_city);
+    fetchData();
+  }
+
   useEffect(() => {
     fetchData();
   }, []);
@@ -286,64 +339,170 @@ function Analytics() {
     <>
       <div className="flex-col md:flex" ref={ref}>
         <div className="flex-1 space-y-4 p-8 pt-6">
-          <div className="flex items-center justify-between space-y-2">
-            <h2 className="text-3xl font-bold tracking-tight">Analytics</h2>
-            <div className="flex items-center space-x-2">
-              <Button onClick={downloadAnalyticsImage}>Download</Button>
+          <div className="flex flex-col items-center justify-between space-y-2 w-full">
+            <div className="w-full flex items-center justify-between space-x-2">
+              <h2 className="text-3xl font-bold tracking-tight">Analytics</h2>
+              <div className="grid-cols-2 space-x-2">
+                <Button disabled={loading} variant="outline" className="bg-inherit500" onClick={handleFilter}>Filters<Filter /></Button>
+                <Button disabled={loading} onClick={downloadAnalyticsImage}>Download</Button>
+              </div>
             </div>
+            { showFilters && (
+              <Card className="filter-container w-full">
+                <CardHeader className="p-3">
+                  <CardTitle className="text-lg">Filters</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                <form>
+                <fieldset disabled={loading}>
+                  <div className="flex space-x-12 mb-4">
+                    <div className="text-sm">
+                      Start Time and Date
+                      <div className="grid gap-2">
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button
+                              id="date"
+                              variant={"outline"}
+                              className={cn(
+                                "w-[300px] justify-start text-left font-normal",
+                                !date && "text-muted-foreground"
+                              )}
+                            >
+                              <CalendarIcon />
+                              {date?.from ? (
+                                date.to ? (
+                                  <>
+                                    {format(date.from, "LLL dd, y")} -{" "}
+                                    {format(date.to, "LLL dd, y")}
+                                  </>
+                                ) : (
+                                  format(date.from, "LLL dd, y")
+                                )
+                              ) : (
+                                <span>Pick a date</span>
+                              )}
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar
+                              initialFocus
+                              mode="range"
+                              defaultMonth={date?.from}
+                              selected={date}
+                              onSelect={setDate}
+                              numberOfMonths={2}
+                            />
+                          </PopoverContent>
+                        </Popover>
+                      </div>
+                    </div>
+                    <div className="text-sm mt-[20px]">
+                      {/* Search QR Code */}
+                      {/* <Input className= "w-[300px] text-muted-foreground h-9" placeholder="Search QR Codes"/> */}
+                      <AutoComplete
+                        selectedValue={selectedValue_qr}
+                        onSelectedValueChange={setSelectedValue_qr}
+                        searchValue={searchValue_qr}
+                        onSearchValueChange={setSearchValue_qr}
+                        // items={FRAMEWORKS ?? []}
+                        items={qrCodesNames ?? []}
+                        // isLoading={isLoading}
+                        width="300"
+                        emptyMessage="No items found."
+                        placeholder="Search QR Codes"
+                      />
+                    </div>
+                  </div>
+                  <div className="flex justify-between">
+                    <div className="flex justify-between space-x-6">
+                      <div className="text-sm">
+                        Filters By Geography
+                        {/* <Input className= "w-[200px] text-muted-foreground h-9" placeholder="Search Country"/> */}
+                        <AutoComplete
+                          selectedValue={selectedValue_country}
+                          onSelectedValueChange={setSelectedValue_country}
+                          searchValue={searchValue_country}
+                          onSearchValueChange={setSearchValue_country}
+                          items={qrCodesCountry ?? []}
+                          // items={FRAMEWORKS ?? []}
+                          emptyMessage="No items found."
+                          placeholder="Search Country"
+                        />
+                      </div>
+                      <div className="text-sm pt-[20px]">
+                        {/* State */}
+                        {/* <Input className= "w-[200px] text-muted-foreground h-9" placeholder="Search State"/> */}
+                        <AutoComplete
+                          selectedValue={selectedValue_state}
+                          onSelectedValueChange={setSelectedValue_state}
+                          searchValue={searchValue_state}
+                          onSearchValueChange={setSearchValue_state}
+                          items={qrCodesState ?? []}
+                          // items={FRAMEWORKS ?? []}
+                          emptyMessage="No items found."
+                          placeholder="Search State"
+                        />
+                      </div>
+                      <div className="text-sm pt-[20px]">
+                        {/* City */}
+                        {/* <Input className= "w-[200px] text-muted-foreground h-9" placeholder="Search City"/> */}
+                        <AutoComplete
+                          selectedValue={selectedValue_city}
+                          onSelectedValueChange={setSelectedValue_city}
+                          searchValue={searchValue_city}
+                          onSearchValueChange={setSearchValue_city}
+                          items={qrCodesCity ?? []}
+                          // items={FRAMEWORKS ?? []}
+                          emptyMessage="No items found."
+                          placeholder="Search City"
+                        />
+                      </div>
+                    </div>
+                    <div className="p-[23px] pb-0 pr-0">
+                      <Button disabled={loading} className="w-18 h-9" onClick={handleFilterSubmit}>Apply{loading && <LoaderCircle className="loadingSpinner ml-1" />}</Button>
+                    </div>
+                  </div>
+                  </fieldset>
+                </form>
+                </CardContent>
+                {/* <CardFooter className="flex justify-end">
+                  <Button className="w-16 h-9">Apply</Button>
+                </CardFooter> */}
+              </Card>
+            )}
           </div>
           <Tabs defaultValue="overview" className="space-y-4">
             <TabsContent value="overview" className="space-y-4">
               {/* top card container -----------------------------------------------*/}
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                 {/* total qr codes----------------------------------------- */}
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">
-                      Total QR Codes
-                    </CardTitle>
-
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      className="h-4 w-4 text-muted-foreground"
-                    >
-                      <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
-                    </svg>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">
-                      {loading ? (
-                        <LoaderCircle className="loadingSpinner mx-auto" />
-                      ) : (
-                        totalQrCodes
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
+                {/* {filterApplied && ( */}
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-medium">
+                        Total QR Codes
+                      </CardTitle>
+                      <QrCode size={20} color="#8f8f8f" />
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold">
+                        {loading ? (
+                          <LoaderCircle className="loadingSpinner mx-auto" />
+                        ) : (
+                          totalQrCodes
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                {/* )} */}
                 {/* total scans----------------------------------------- */}
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">
                       Total Scans
                     </CardTitle>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      className="h-4 w-4 text-muted-foreground"
-                    >
-                      <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-                    </svg>
+                    <ScanQrCode size={20} color="#8f8f8f" />
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold">
@@ -364,20 +523,7 @@ function Analytics() {
                     <CardTitle className="text-sm font-medium">
                       Total Unique Users
                     </CardTitle>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      className="h-4 w-4 text-muted-foreground"
-                    >
-                      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-                      <circle cx="9" cy="7" r="4" />
-                      <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
-                    </svg>
+                    <Users size={17} color="#8f8f8f" />
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold">
@@ -398,19 +544,7 @@ function Analytics() {
                     <CardTitle className="text-sm font-medium">
                       Average Scan Per User
                     </CardTitle>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      className="h-4 w-4 text-muted-foreground"
-                    >
-                      <rect width="20" height="14" x="2" y="5" rx="2" />
-                      <path d="M2 10h20" />
-                    </svg>
+                    <ScanLine size={18} color="#8f8f8f" />
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold">
@@ -556,10 +690,10 @@ function Analytics() {
               <div className="min-h-screen grid gap-4 md:grid-cols-2">
                 {/* top 10 scanned qr codes ------------------------------ */}
                 <Card className="h-[310px] col-span-1">
-                  <CardHeader className="pl-6 pt-4 pb-4">
+                  <CardHeader className="pl-4 pt-4 pb-4">
                     <CardTitle>Top 10 Scanned QR Codes</CardTitle>
                   </CardHeader>
-                  <CardContent className="pb-0">
+                  <CardContent className="pb-0 pl-4">
                     <ChartContainer
                       config={topTenScannedQRChartConfig}
                       className=" min-h-[200px] h-[245px] w-full"
@@ -568,12 +702,11 @@ function Analytics() {
                         <LoaderCircle className="loadingSpinner mx-auto my-auto w-6" />
                       ) : (
                         <BarChart
-                          className=""
                           accessibilityLayer
                           data={topTenScannedQrCodes}
                           layout="vertical"
                           margin={{
-                            left: -20,
+                            left: -50,
                           }}
                         >
                           <XAxis type="number" dataKey="scans" hide />
@@ -581,9 +714,9 @@ function Analytics() {
                             dataKey="qrCodeName"
                             type="category"
                             tickLine={false}
-                            tickMargin={10}
+                            tickMargin={0}
                             axisLine={false}
-                            tickFormatter={(value) => value.slice(0, 3)}
+                            width={200}
                           />
                           <ChartTooltip
                             cursor={false}
@@ -607,10 +740,10 @@ function Analytics() {
                   </CardContent>
                 </Card>
                 <Card className="h-[310px] col-span-1">
-                  <CardHeader className="pl-6 pt-4 pb-4">
+                  <CardHeader className="pl-4 pt-4 pb-4">
                     <CardTitle>Top 10 Scanned QR Codes By Unique Users</CardTitle>
                   </CardHeader>
-                  <CardContent className="pb-0">
+                  <CardContent className="pb-0 pl-4">
                     <ChartContainer
                       config={topTenQRByUniqueUsersChartConfig}
                       className=" min-h-[200px] h-[245px] w-full"
@@ -623,7 +756,7 @@ function Analytics() {
                           data={topTenQRCodesByUniqueUsers}
                           layout="vertical"
                           margin={{
-                            left: -20,
+                            left: -50,
                           }}
                         >
                           <XAxis type="number" dataKey="unique_users" hide />
@@ -631,9 +764,10 @@ function Analytics() {
                             dataKey="qrCodeName"
                             type="category"
                             tickLine={false}
-                            tickMargin={10}
+                            tickMargin={0}
                             axisLine={false}
-                            tickFormatter={(value) => value.slice(0, 3)}
+                            width={200}
+                            // tickFormatter={(value) => value.slice(0, 3)}
                           />
                           <ChartTooltip
                             cursor={false}
@@ -668,7 +802,7 @@ function Analytics() {
                       {loading ? (
                         <LoaderCircle className="loadingSpinner mx-auto w-6" />
                       ) : (
-                        
+
                         <BarChart
                         accessibilityLayer
                         data={scanByTimeOfDay}
@@ -811,9 +945,8 @@ function Analytics() {
                 <DataTable title={"Top 10 Scanning Cities"} columns={columns} data={data}>
                 </DataTable> */}
               </div>
-              
                 <Card>
-                  <CardHeader className="pl-6 pt-4 pb-4">
+                  <CardHeader className="pl-6 pt-6 pb-4">
                     <CardTitle>Top Scanned QR Codes</CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -823,7 +956,7 @@ function Analytics() {
                       <DataTable className="rounded-lg border bg-card text-card-foreground shadow-sm" columns={columns(handleDelete, handleEdit)} data={data} />
                     )}
                   </CardContent>
-                </Card> 
+                </Card>
             </TabsContent>
           </Tabs>
         </div>

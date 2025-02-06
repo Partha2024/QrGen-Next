@@ -4,15 +4,15 @@
   }
 }
 
-#createPage {
+/* #createPage {
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100%;
-  /* padding-top: 40px; */
-}
+  padding-top: 40px;
+} */
 
-.createPageCard{
+/* .createPageCard{
   background-color: #fbfbfb;
 }
 
@@ -50,7 +50,7 @@
 
 .blur{
   filter: blur(3px);
-}
+} */
 
 .loadingSpinner{
   display: flex;
