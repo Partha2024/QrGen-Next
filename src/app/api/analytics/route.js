@@ -38,8 +38,8 @@ export async function POST(req) {
     }
     let whereConditions_q = '';
 
-    if (dateRange && dateRange.startDate && dateRange.endDate) {
-      whereConditions_q += ` AND scan_date >= '${new Date(dateRange.startDate).toISOString()}' AND scan_date <= '${new Date(dateRange.endDate).toISOString()}'`;
+    if (dateRange && dateRange.from && dateRange.to) {
+      whereConditions_q += ` AND scan_date >= '${new Date(dateRange.from).toISOString()}' AND scan_date <= '${new Date(dateRange.to).toISOString()}'`;
     }
     if (qrCodeName) {
       whereConditions_q += ` AND qr_unique_id = '${qrCodeName}'`;
