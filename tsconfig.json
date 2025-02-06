@@ -33,7 +33,7 @@
     "**/*.tsx", 
     "src/lib/use-forwarded-ref.jsx", 
     "src/components/ui/color-picker.jsx",   
-    "src/app/edit/component/ClientQR.jsx", "src/components/autocomplete.tsx", "src/app/analytics/components/ui/command.jsx"  ],
+    "src/app/edit/component/ClientQR.jsx", "src/components/autocomplete.tsx", "src/app/analytics/components/ui/command.tsx"  ],
   "exclude": [
     "node_modules"
   ]
