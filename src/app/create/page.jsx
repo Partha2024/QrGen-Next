@@ -407,7 +407,7 @@ function CreateQRComponent() {
           </Form>
         </CardContent>
         <CardFooter className="p-0">
-          <div className="hidden">
+          <div className="fixed top-[10000px]">
             <ClientQR options={payload}/>
           </div>
         </CardFooter>
