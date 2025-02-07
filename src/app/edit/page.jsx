@@ -594,7 +594,7 @@ function EditQRComponent() {
                   <img
                     src={qrImageSrc}
                     alt="QR Code"
-                    className="max-w[220px] max-h-[220px]"
+                    className="max-w-[220px] max-h-[220px] w-[220px] h-[220px ]"
                     id="imageeeeee"
                   />
                   <div className="flex flex-col items-center gap-2 mt-10">

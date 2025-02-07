@@ -44,8 +44,8 @@ export default function ClientQR({options}) {
   return (
     <>
       <div id="qrImageDiv" ref={ref}/>
-      <div className="flex flex-col items-center gap-2">
-        {/* <input value={options.data} onChange={onDataChange} className={styles.inputBox}/> */}
+      {/* <div className="flex flex-col items-center gap-2">
+        <input value={options.data} onChange={onDataChange} className={styles.inputBox}/>
         <select onChange={onExtensionChange} value={fileExt}> 
           <option value="svg">SVG</option>
           <option value="png">PNG</option>
@@ -53,7 +53,7 @@ export default function ClientQR({options}) {
           <option value="webp">WEBP</option>
         </select>
         <button onClick={onDownloadClick}>Download</button>
-      </div>
+      </div> */}
     </>
   );
 }
