@@ -92,7 +92,8 @@ export async function POST(req) {
     const scanTimelineData = await Promise.all(
       scanTimelineData_scans.map(async (item) => {
         const uniqueUsers = await prisma.qRScan.findMany({
-          where: { scan_date: item.scan_date },
+          // where: { scan_date: item.scan_date },
+          where: { scan_date: item.scan_date, ...whereConditions }, //i have to change this to something where to and from are not used 
           distinct: ["scan_ip_address"],
           select: {
             scan_ip_address: true,

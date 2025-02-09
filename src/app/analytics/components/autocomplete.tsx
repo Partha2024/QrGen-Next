@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 import { Command as CommandPrimitive } from "cmdk";
 import { Check } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import {
   Command,
   CommandEmpty,
@@ -31,12 +31,19 @@ export function AutoComplete<T extends string>({
   searchValue,
   onSearchValueChange,
   items,
-  isLoading,
+  isLoading = false,
   emptyMessage = "No items.",
   placeholder = "Search...",
   width = "200"
 }: Props<T>) {
   const [open, setOpen] = useState(false);
+
+  const filteredItems = useMemo(() => {
+    if (!searchValue) return items;
+    return items.filter(item =>
+      item.label.toLowerCase().includes(searchValue.toLowerCase())
+    );
+  }, [items, searchValue]);
 
   const labels = useMemo(
     () =>
@@ -110,9 +117,9 @@ export function AutoComplete<T extends string>({
                   </div>
                 </CommandPrimitive.Loading>
               )}
-              {items.length > 0 && !isLoading ? (
+              {filteredItems.length > 0 && !isLoading ? (
                 <CommandGroup>
-                  {items.map((option) => (
+                  {filteredItems.map((option) => (
                     <CommandItem
                       key={option.value}
                       value={option.value}

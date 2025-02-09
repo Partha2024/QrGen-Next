@@ -264,11 +264,11 @@ const DesignOptions = forwardRef( ({
   }
 
   return (
-    <Dialog>
+    <Dialog modal={true}>
       <DialogTrigger asChild>
         <Button variant="secondary">QR Design Options</Button>
       </DialogTrigger>
-      <DialogContent className="lg:max-w-[1000px] lg:max-h-[560px] overflow-hidden absolute" onInteractOutside={(e) => { e.preventDefault(); }}>
+      <DialogContent className="lg:max-w-[1000px] lg:max-h-[560px] overflow-hidden absolute pointer-events-auto" onInteractOutside={(e) => { e.preventDefault(); }}>
         <DialogHeader>
           <DialogTitle>QR Code Design</DialogTitle>
           {/* <DialogDescription>
@@ -336,10 +336,19 @@ const DesignOptions = forwardRef( ({
                         value={designQRColor}
                         onChange={(v) => {
                           setQRColor(v);
+                          setCornerSquareColor(v);
+                          setCornerDotColor(v);
                           setOptions((options) => ({
                             ...options,
                             dotsOptions: {
                               ...options.dotsOptions,
+                              color: v,
+                            },
+                            cornersSquareOptions: {
+                              ...options.cornersSquareOptions,
+                              color: v,
+                            },cornersDotOptions: {
+                              ...options.cornersDotOptions,
                               color: v,
                             },
                           }));
