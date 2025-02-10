@@ -35,13 +35,13 @@ const ColorPicker = forwardRef(({
       </PopoverTrigger>
       <PopoverContent className="w-full" style={{ pointerEvents: "auto" }}>
         <HexColorPicker color={parsedValue} onChange={onChange} />
-        {/* <Input
+        <Input
           className="mt-2"
           maxLength={7}
           onChange={(e) => onChange(e.currentTarget.value)}
           ref={ref}
           value={parsedValue}
-        /> */}
+        />
       </PopoverContent>
     </Popover>
   );
