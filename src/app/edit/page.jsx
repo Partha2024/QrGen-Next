@@ -343,7 +343,7 @@ function EditQRComponent() {
             </svg>
           `;
           const svgBlob = new Blob([svgData], { type: "image/svg+xml" });
-          saveAs(svgBlob, "qr-code.svg");
+          saveAs(svgBlob, qrCodeName+".svg");
 
           // ImageTracer.imageToSVG(reader.result, function (svgData) {
           //   if (!svgData.includes("<svg")) {

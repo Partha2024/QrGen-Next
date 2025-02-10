@@ -476,12 +476,13 @@ function Analytics() {
             <TabsContent value="overview" className="space-y-4">
               {/* top card container -----------------------------------------------*/}
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+              {/* <div className={`grid gap-4 md:grid-cols-3 lg:grid-cols-${filterApplied ? '4' : '3'}`}> */}
                 {/* total qr codes----------------------------------------- */}
                 {/* {filterApplied && ( */}
                   <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                       <CardTitle className="text-sm font-medium">
-                        Total QR Codes
+                        Total Dynamic QR Codes
                       </CardTitle>
                       <QrCode size={20} color="#8f8f8f" />
                     </CardHeader>

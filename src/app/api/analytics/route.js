@@ -56,6 +56,7 @@ export async function POST(req) {
 
     let totalQrCodes = await prisma.qRCode.count({
       // where: whereConditions,
+      where: { qr_code_type: "dynamic" }
     });
 
     //total scans
