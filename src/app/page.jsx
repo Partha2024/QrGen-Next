@@ -1,39 +1,26 @@
-'use client';
-import { Button } from "@/components/ui/button";
-import { Link, MessageSquareMore } from "lucide-react";
+"use client";
+import { useContext, useEffect, useState } from "react";
+import { AuthContext } from "@/components/AuthProvider";
+import { useRouter } from "next/navigation";
+import { LoaderCircle } from "lucide-react";
 
 export default function Home() {
+  const { user } = useContext(AuthContext);
+  const router = useRouter();
+  const [loading, setLoading] = useState(true); // Track loading state
 
-  function openCreate(qrCodeExperience) {
-    console.log(qrCodeExperience);  
-    window.location.href = "/create?qr=" + qrCodeExperience;
-  }
+  useEffect(() => {
+    if (user !== null) {
+      setLoading(false);
+      if (user) {
+        router.push("/home");
+      } else {
+        router.push("/login");
+      }
+    }
+  }, [user, router]);
 
-  return (
-    <main>
-      <ul>
-        <a href="/create" />
-        <a href="/manage" />
-        <a href="/analytics" />
-        <a href="/settings" />
-      </ul>
+  if (loading) return <div className="h-full"><LoaderCircle className="loadingSpinner mx-auto" /></div>;
 
-      <section className="homepage">
-        <div className="qr_options">
-          <Button variant="outline" className="options" onClick={()=>openCreate('url')}>
-            <em>
-              <Link />
-            </em>
-            URL
-          </Button>
-          <Button variant="outline" className="options" onClick={()=>openCreate('sms')}>
-            <em>
-              <MessageSquareMore />
-            </em>
-            SMS
-          </Button>
-        </div>     
-      </section>
-    </main>
-  );
+  return null;
 }

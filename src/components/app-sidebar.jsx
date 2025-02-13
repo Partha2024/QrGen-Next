@@ -1,6 +1,7 @@
 "use client";
 
-import * as React from "react";
+import { useContext, useEffect, useState } from "react";
+import { AuthContext } from "@/components/AuthProvider";
 
 import { Calendar, Home, Inbox, Search, Settings, Plus, ChartNoAxesGantt, ChartArea, User2, ChevronDown, ChevronUp, Pencil} from "lucide-react";
 import {
@@ -52,30 +53,11 @@ const items = [
 ];
 
 export function AppSidebar({ ...props }) {
+
+  const { user, logout } = useContext(AuthContext);
+  
   return (
     <Sidebar>
-      {/* <SidebarHeader>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <SidebarMenuButton>
-                  Select Workspace
-                  <ChevronDown className="ml-auto" />
-                </SidebarMenuButton>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-[--radix-popper-anchor-width]">
-                <DropdownMenuItem>
-                  <span>Acme Inc</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <span>Acme Corp.</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarHeader> */}
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupContent>
@@ -94,13 +76,13 @@ export function AppSidebar({ ...props }) {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      {/* <SidebarFooter>
+      <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton>
-                  <User2 /> Username
+                  <User2 /> {user?.username}
                   <ChevronUp className="ml-auto" />
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
@@ -108,20 +90,17 @@ export function AppSidebar({ ...props }) {
                 side="top"
                 className="w-[--radix-popper-anchor-width]"
               >
-                <DropdownMenuItem>
-                  <span>Account</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <span>Billing</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
+                {/* <DropdownMenuItem>
+                  <span>Settings</span>
+                </DropdownMenuItem> */}
+                <DropdownMenuItem onClick={logout}>
                   <span>Sign out</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </SidebarMenuItem>
         </SidebarMenu>
-      </SidebarFooter> */}
+      </SidebarFooter>
     </Sidebar>
   );
 }
