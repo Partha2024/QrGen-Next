@@ -1,6 +1,7 @@
 "use client";
 
-import { React, useEffect, useState, useCallback, useRef } from "react";
+import { React, useEffect, useState, useCallback, useRef, useContext } from "react";
+import { AuthContext } from "@/components/AuthProvider";
 import { toPng } from 'html-to-image';
 import { Button } from "@/components/ui/button";
 import {
@@ -134,6 +135,15 @@ const scanOSConfig = {
 };
 
 function Analytics() {
+
+  const { user } = useContext(AuthContext);
+  const [authLoading, setAuthLoading] = useState(true);
+
+  useEffect(() => {
+    if (user !== null) {
+      setAuthLoading(false);
+    }
+  }, [user]);
 
   const ref = useRef(null);
 
@@ -337,6 +347,7 @@ function Analytics() {
 
   return (
     <>
+    { authLoading ? (<LoaderCircle className="loadingSpinner mx-auto" />) : (
       <div className="flex-col md:flex" ref={ref}>
         <div className="flex-1 space-y-4 p-8 pt-6">
           <div className="flex flex-col items-center justify-between space-y-2 w-full">
@@ -962,6 +973,7 @@ function Analytics() {
           </Tabs>
         </div>
       </div>
+      )}
     </>
   );
 }

@@ -5,9 +5,7 @@ import "./style.css";
 
 import { columns } from "./columns";
 import { DataTable } from "./data-table";
-
 import { LoaderCircle } from "lucide-react";
-
 import { toast } from "sonner";
 
 function formatDate(date) {

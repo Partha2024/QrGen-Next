@@ -1,6 +1,7 @@
 "use client";
 
-import { React, useState, useEffect, Suspense, useRef } from "react";
+import { React, useState, useEffect, Suspense, useContext } from "react";
+import { AuthContext } from "@/components/AuthProvider";
 import "./page.css";
 
 import { Check, ChevronsUpDown, LoaderCircle, Trash2 } from "lucide-react"
@@ -69,6 +70,15 @@ const qrCodeTypes = [
 ];
 
 function CreateQRComponent() {
+
+  const { user } = useContext(AuthContext);
+  const [authLoading, setAuthLoading] = useState(true);
+
+  useEffect(() => {
+    if (user !== null) {
+      setAuthLoading(false);
+    }
+  }, [user]);
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -243,6 +253,7 @@ function CreateQRComponent() {
 
   return (
     <section id="createPage" className="w-full flex p-6 justify-center items-center">
+      { authLoading ? (<LoaderCircle className="min-h-lvh loadingSpinner mx-auto" />) : (
       <Card className="formDiv createPageCard w-full">
         <CardContent className="p-6 pt-4">
           <Form {...form}  >
@@ -341,7 +352,7 @@ function CreateQRComponent() {
 
               <Separator className="my-5" />
 
-              <DesignOptions name="qrColor" className="mt-2 w-8 h-8 rounded-lg" value={designData} onChange={handleDesignDataChange} />
+              <DesignOptions name="qrColor" value={designData} onChange={handleDesignDataChange} />
 
               <Separator className="my-5" />
 
@@ -411,18 +422,8 @@ function CreateQRComponent() {
             <ClientQR options={payload}/>
           </div>
         </CardFooter>
-      </Card>
-      {/* <div className="qrDiv createPageCard">
-        <div className="qrImage">
-        {qrImageSrc ? (
-            <img src={qrImageSrc} alt="QR Code" className="w-full h-auto" />
-          ) : (
-            <div className="placeholder">
-              <ClientQR options={payload}/>
-            </div>
-          )}
-        </div>
-      </div> */}
+      </Card>      
+      )}
     </section>
   );
 }
