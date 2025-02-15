@@ -3,6 +3,7 @@ import { SidebarProvider } from "@/components/ui/sidebar"
 import { Poppins } from "next/font/google";
 import AuthProvider from "@/components/AuthProvider";
 import ClientLayout from "@/components/ClientLayout";
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 export const metadata = {
   title: "QRGen",
@@ -39,6 +40,7 @@ export default function RootLayout({ children }) {
         <AuthProvider>
           <SidebarProvider>
             <ClientLayout>{children}</ClientLayout>
+            <SpeedInsights />
           </SidebarProvider>
         </AuthProvider>
       </body>
