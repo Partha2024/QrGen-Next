@@ -186,9 +186,9 @@ const DesignOptions = forwardRef( ({
   const [designTypeNumber, setTypeNumber] = useState("0");
   const [designErrorCorrection, setErrorCorrection] = useState("");
 
-  useEffect(() => {
-    console.log("options", JSON.stringify(options, null, 2));
-  }, [options]);
+  // useEffect(() => {
+  //   console.log("options", JSON.stringify(options, null, 2));
+  // }, [options]);
 
   useEffect(() => {
     if( /^#[0-9A-F]{6}[0-9a-f]{0,2}$/i.test(designQRColor) && /^#[0-9A-F]{6}[0-9a-f]{0,2}$/i.test(designCornerSquareColor) && /^#[0-9A-F]{6}[0-9a-f]{0,2}$/i.test(designCornerDotColor) && /^#[0-9A-F]{6}[0-9a-f]{0,2}$/i.test(designQRBackgroundColor) ){

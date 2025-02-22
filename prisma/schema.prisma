@@ -22,6 +22,7 @@ model QRCode {
   qr_image               String?
   createdAt              DateTime @default(now())
   updatedAt              DateTime @updatedAt
+  qr_domain              String?
 
   @@map("qr_codes")
 }
