@@ -37,6 +37,7 @@ const formSchema = z.object({
     message: "QR code name must be at least 2 characters.",
   }),
   qrExperience: z.enum(["url", "sms"]),
+  customDomain: z.string(),
   qrCodeType: z.enum(["dynamic", "static"]),
   url: z.string().optional(),
   phoneNumber: z.string().optional(),
@@ -69,6 +70,12 @@ const qrCodeTypes = [
   { label: "SMS", value: "sms" },
 ];
 
+const customDomains = [
+  { label: "QrGen", value: "https://qrgen-prod.vercel.app/" },
+  { label: "QrGen 1", value: "https://qrgen-redirection-1.vercel.app/" },
+  { label: "QrGen 2", value: "https://qrgen-redirection-2.vercel.app/" },
+];
+
 function CreateQRComponent() {
 
   const { user } = useContext(AuthContext);
@@ -85,6 +92,7 @@ function CreateQRComponent() {
     defaultValues: {
       qrCodeName: "",
       qrExperience: "url",
+      customDomain: customDomains[0].value,
       qrCodeType: "dynamic",
       url: "",
       phoneNumber: "",
@@ -95,6 +103,7 @@ function CreateQRComponent() {
   const [qrImageSrc, setQrImageSrc] = useState("");
   const [payload, setPayload] = useState("");
   const qrExperience = form.watch("qrExperience");
+  const customDomain = form.watch("customDomain") || customDomains[0].value;
   const qrExperienceFromURL = useSearchParams().get("qr") || "url";
   const [designData, setDesignData] = useState({
     width: 220,
@@ -187,6 +196,12 @@ function CreateQRComponent() {
     }
   });
   const [onSubmitLoader, setOnSubmitLoader] = useState(false);
+  const [qrExperienceOpen, setQrExperienceOpen] = useState(false)
+  const [domainOpen, setDomainOpen] = useState(false)
+
+  // useEffect(() => {
+  //   console.log("redirectionUrl", customDomain);
+  // }, []);
 
   function handleDesignDataChange(data){
     setDesignData(data);
@@ -197,7 +212,10 @@ function CreateQRComponent() {
     // console.log("values", values);
     var uidFromUrl = "";
     let uniqueId = values.qrCodeType==="dynamic" ? new Date().getTime().toString() : "sta" + new Date().getTime().toString() + "tic";
-    let redirectionUrl = `https://qrgen-prod.vercel.app/api/redirect/${uniqueId}`; //prod url
+
+    // let redirectionUrl = `https://qrgen-prod.vercel.app/api/redirect/${uniqueId}`; //prod url
+    let redirectionUrl = `${customDomain}api/redirect/${uniqueId}`; //prod url
+    // console.log("🚀 ~ onSubmit ~ redirectionUrl:", redirectionUrl)
 
     if (values.qrCodeType === "dynamic" || values.qrExperience === "sms") {
       designData.data = redirectionUrl;
@@ -263,7 +281,7 @@ function CreateQRComponent() {
                 render={({ field }) => (
                   <FormItem className="flex mb-4 items-center">
                     <FormLabel className="mr-1 mt-[4px] pr-2">QR Experience</FormLabel>
-                    <Popover>
+                    <Popover open={qrExperienceOpen} onOpenChange={setQrExperienceOpen}>
                       <PopoverTrigger asChild>
                         <FormControl>
                           <Button variant="outline" role="combobox"
@@ -283,7 +301,10 @@ function CreateQRComponent() {
                             <CommandGroup>
                               {qrCodeTypes.map((qrExperience) => (
                                 <CommandItem value={qrExperience.label} key={qrExperience.value}
-                                  onSelect={() => {form.setValue("qrExperience", qrExperience.value)}}
+                                  onSelect={() => {
+                                    form.setValue("qrExperience", qrExperience.value)
+                                    setQrExperienceOpen(false)
+                                  }}
                                 >
                                   <Check
                                     className={cn(
@@ -328,6 +349,55 @@ function CreateQRComponent() {
                         </FormItem>
                       </RadioGroup>
                     </FormControl>
+                  </FormItem>
+                )}
+              />
+
+              <FormField control={form.control} name="customDomain"
+                render={({ field }) => (
+                  <FormItem className="flex mb-4 mt-4 items-center">
+                    <FormLabel className="mr-1 mt-[4px] pr-2">Domain</FormLabel>
+                    <Popover open={domainOpen} onOpenChange={setDomainOpen}>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button variant="outline" role="combobox"
+                            className={cn( "w-[200px] justify-between", !field.value )}
+                          >
+                            {field.value ? customDomains.find((customDomain) => customDomain.value === field.value)?.label : customDomains[0].label}
+                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50"/>
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <p className="disabled ml-4 pointer-events-none text-muted-foreground text-xs">
+                        {customDomain}
+                      </p>
+                      <PopoverContent className="w-[200px] p-0">
+                        <Command>
+                          <CommandList>
+                            <CommandGroup>
+                              {customDomains.map((customDomain) => (
+                                <CommandItem value={customDomain.label} key={customDomain.value}
+                                  onSelect={() => {
+                                    form.setValue("customDomain", customDomain.value)
+                                    setDomainOpen(false)
+                                  }}
+                                >
+                                  <Check
+                                    className={cn(
+                                      "mr-2 h-4 w-4",
+                                      customDomain.value === field.value
+                                        ? "opacity-100"
+                                        : "opacity-0"
+                                    )}
+                                  />
+                                  {customDomain.label}
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          </CommandList>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
                   </FormItem>
                 )}
               />
@@ -422,7 +492,7 @@ function CreateQRComponent() {
             <ClientQR options={payload}/>
           </div>
         </CardFooter>
-      </Card>      
+      </Card>
       )}
     </section>
   );

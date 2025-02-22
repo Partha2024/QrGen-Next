@@ -66,6 +66,7 @@ const formSchema = z
     url: z.string().optional(),
     phoneNumber: z.string().optional(),
     smsBody: z.string().optional(),
+    customDomain: z.string(),
   })
   .superRefine((data, ctx) => {
     if (data.qrExperience === "url" && !data.url) {
@@ -109,11 +110,20 @@ const extensions = [
   },
 ];
 
+const customDomains = [
+  { label: "QrGen", value: "https://qrgen-prod.vercel.app/" },
+  { label: "QrGen 1", value: "https://qrgen-redirection-1.vercel.app/" },
+  { label: "QrGen 2", value: "https://qrgen-redirection-2.vercel.app/" },
+];
+
 //created an seperate function because of suspense issue
 function EditQRComponent() {
   const [qrCodeName, setQrCodeName] = useState("qrcode");
   const [qrCodeTypeEx, setQrCodeTypeEx] = useState("");
   const [isUpdated, setIsUpdated] = useState("false");
+  const [customDomain, setCustomDomain] = useState("");
+  const [qrUrl, setQrUrl] = useState("");
+  // const customDomain = form.watch("customDomain") || customDomains[0].value;
 
   //defining form and default values
   const form = useForm({
@@ -121,6 +131,7 @@ function EditQRComponent() {
     defaultValues: {
       qrCodeName: "",
       qrExperience: "url",
+      customDomain: "",
       qrCodeType: "dynamic",
       url: "",
       phoneNumber: "",
@@ -266,11 +277,13 @@ function EditQRComponent() {
         url: data.content_url || "",
         phoneNumber: data.content_phone_number || "",
         smsBody: data.content_sms_body || "",
+        customDomain: data.qr_domain,
       });
       form.clearErrors();
       setqrCodeColor(data.design_qr_color);
       setqrCodeBackgroundColor(data.design_bg_color || "#0064ff");
       setQrImageSrc(data.qr_image);
+      setQrUrl(data.qr_url)
     });
   }, [uidFromUrl, form]);
 
@@ -479,6 +492,55 @@ function EditQRComponent() {
                               </FormItem>
                             </RadioGroup>
                           </FormControl>
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField control={form.control} name="customDomain"
+                      render={({ field }) => (
+                        <FormItem className="flex mb-4 mt-4 items-center">
+                          <FormLabel className="mr-1 mt-[4px] pr-2">Domain</FormLabel>
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <FormControl>
+                                <Button disabled variant="outline" role="combobox"
+                                  className={cn( "w-[200px] justify-between", !field.value )}
+                                >
+                                  {field.value ? customDomains.find((customDomain) => customDomain.value === field.value)?.label : customDomains[0].label}
+                                  {/* <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50"/> */}
+                                </Button>
+                              </FormControl>
+                            </PopoverTrigger>
+                            <p className="disabled ml-4 pointer-events-none text-muted-foreground text-xs">
+                              {qrUrl}
+                            </p>
+                            {/* <PopoverContent className="w-[200px] p-0">
+                              <Command>
+                                <CommandList>
+                                  <CommandGroup>
+                                    {customDomains.map((customDomain) => (
+                                      <CommandItem value={customDomain.label} key={customDomain.value}
+                                        onSelect={() => {
+                                          form.setValue("customDomain", customDomain.value)
+                                          setDomainOpen(false)
+                                        }}
+                                      >
+                                        <Check
+                                          className={cn(
+                                            "mr-2 h-4 w-4",
+                                            customDomain.value === field.value
+                                              ? "opacity-100"
+                                              : "opacity-0"
+                                          )}
+                                        />
+                                        {customDomain.label}
+                                      </CommandItem>
+                                    ))}
+                                  </CommandGroup>
+                                </CommandList>
+                              </Command>
+                            </PopoverContent> */}
+                          </Popover>
                         </FormItem>
                       )}
                     />

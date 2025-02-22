@@ -17,7 +17,8 @@ export async function POST(req) {
     qrCodeBackgroundColor,
     qrImage,
     uniqueId,
-    qrUrl
+    qrUrl,
+    customDomain
   } = await req.json();
 
 
@@ -93,6 +94,7 @@ export async function POST(req) {
           content_sms_body: qrExperience === "sms" ? smsBody : null, // Only store if QR code type is SMS
           qr_url: qrUrl, // dynamic generated url / staic url
           qr_image: qrImage,
+          qr_domain: customDomain
         },
       });
       return NextResponse.json({
