@@ -5,7 +5,7 @@ import { Link, MessageSquareMore } from "lucide-react";
 export default function HomePage() {
   
   function openCreate(qrCodeExperience) {
-    console.log(qrCodeExperience);  
+    // console.log(qrCodeExperience);  
     window.location.href = "/create?qr=" + qrCodeExperience;
   }
 

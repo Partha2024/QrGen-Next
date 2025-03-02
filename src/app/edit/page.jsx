@@ -207,7 +207,7 @@ function EditQRComponent() {
       },
     },
     cornersDotOptions: {
-      type: "",
+      type: "Square",
       color: "#000000",
     },
     cornersDotOptionsHelper: {
@@ -268,7 +268,7 @@ function EditQRComponent() {
   useEffect(() => {
     fetchQrData(uidFromUrl).then((data) => {
       setQrCodeName(data.qr_code_name);
-      // console.log("🚀 ~ data:", data)
+      console.log("🚀 ~ data:", data)
       setQrCodeTypeEx(data.qr_code_type);
       form.reset({
         qrCodeName: data.qr_code_name,
@@ -283,9 +283,48 @@ function EditQRComponent() {
       setqrCodeColor(data.design_qr_color);
       setqrCodeBackgroundColor(data.design_bg_color || "#0064ff");
       setQrImageSrc(data.qr_image);
-      setQrUrl(data.qr_url)
+      setQrUrl(data.qr_url);
+
+      //updating designDate with fetched data
+      setDesignData({
+        ...designData,
+        data: data.qr_url,
+        image: data.image,
+        imageOptions: {
+          ...designData.imageOptions,
+          imageSize: data.imageOptions_imageSize,
+          margin: data.imageOptions_margin
+        },
+        dotsOptions: {
+          ...designData.dotsOptions,
+          color: data.dotsOptions_color,
+          type: data.dotsOptions_type,
+        },
+        backgroundOptions: {
+          ...designData.backgroundOptions,
+          color: data.backgroundOptions_color,
+        },
+        cornersSquareOptions: {
+          ...designData.cornersSquareOptions,
+          type: data.cornersSquareOptions_type,
+          color: data.cornersSquareOptions_color,
+        },
+        cornersDotOptions: {
+          ...designData.cornersDotOptions,
+          type: data.cornersDotOptions_type,
+          color: data.cornersDotOptions_color,
+        },
+        qrOptions: {
+          ...designData.qrOptions,
+          errorCorrectionLevel: data.qrOptions_errorCorrectionLevel,
+        },
+      });
     });
   }, [uidFromUrl, form]);
+
+  useEffect(() => {
+    setPayload(designData);
+  }, [designData])
 
   const [onSubmitLoader, setOnSubmitLoader] = useState(false);
   //handling form submit
@@ -308,6 +347,7 @@ function EditQRComponent() {
       let dbDataUrl = dataUrl === "data:," ? qrImageSrc : dataUrl;
       form.clearErrors();
       const dbData = {
+        designData,
         ...values,
         uidFromUrl,
         qrCodeColor: designData.dotsOptions.color,
@@ -573,6 +613,7 @@ function EditQRComponent() {
                       className="mt-2 w-8 h-8 rounded-lg"
                       value={designData}
                       onChange={handleDesignDataChange}
+                      optionss={payload}
                     />
 
                     <Separator className="my-5" />
@@ -651,7 +692,7 @@ function EditQRComponent() {
           </Card>
           <Card className="qrDiv createPageCard min-w-[29%] flex justify-center items-center" >
             <CardContent>
-              {isUpdated ? (
+              {/* {isUpdated ? (
                 <div>
                   <img
                     src={qrImageSrc}
@@ -711,14 +752,14 @@ function EditQRComponent() {
                     </Button>
                   </div>
                   <div className="hidden">
-                    <ClientQR options={payload} />
+                    <ClientQR options={payload} qrCodeName={qrCodeName} />
                   </div>
-                </div>
-              ) : (
+                </div> */}
+               {/* ) : ( */}
                 <div className="flex flex-col items-center">
                   <ClientQR options={payload} qrCodeName={qrCodeName} />
                 </div>
-              )}
+               {/* )} */}
             </CardContent>
           </Card>
         </section>

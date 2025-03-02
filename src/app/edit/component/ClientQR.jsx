@@ -155,7 +155,7 @@ export default function ClientQR({ options, qrCodeName }) {
 
   useEffect(() => {
     setQrCode(new QRCodeStyling(options));
-  }, []);
+  }, [options]);
 
   useEffect(() => {
     if (ref.current && qrCode) {

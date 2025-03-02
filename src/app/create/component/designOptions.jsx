@@ -3,6 +3,7 @@
 import React, { forwardRef, useMemo, useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Switch } from "@/components/ui/switch"
 import {
   Command,
   CommandEmpty,
@@ -65,7 +66,7 @@ const errorCorrectionLevels = [
 ]
 
 const DesignOptions = forwardRef( ({
-  disabled, value, onChange, onBlur, name, className, ...props
+  disabled, value, onChange, onBlur, name, className, optionss, ...props
 }, forwardedRef) => {
 
   const contrast = require("get-contrast");
@@ -80,7 +81,7 @@ const DesignOptions = forwardRef( ({
     qrOptions: {
       typeNumber: "0",
       mode: "Byte",
-      errorCorrectionLevel: "L"
+      errorCorrectionLevel: "Q"
     },
     imageOptions: {
       hideBackgroundDots: true,
@@ -127,10 +128,10 @@ const DesignOptions = forwardRef( ({
         color1: "#000000",
         color2: "#000000",
         rotation: "0"
-      }
+      } 
     },
     cornersDotOptions: {
-      type: "",
+      type: "Square",
       color: "#000000"
     },
     cornersDotOptionsHelper: {
@@ -161,6 +162,44 @@ const DesignOptions = forwardRef( ({
     }
   });
 
+  useEffect(() => {
+    //updating designDate with fetched data
+    setOptions({
+      ...options,
+      data: optionss.data,
+      image: optionss.image,
+      imageOptions: {
+        ...options.imageOptions,
+        imageSize: optionss.imageOptions.imageSize,
+        margin: optionss.imageOptions.margin
+      },
+      dotsOptions: {
+        ...options.dotsOptions,
+        color: optionss.dotsOptions.color,
+        type: optionss.dotsOptions.type,
+      },
+      backgroundOptions: {
+        ...options.backgroundOptions,
+        color: optionss.backgroundOptions.color,
+      },
+      cornersSquareOptions: {
+        ...options.cornersSquareOptions,
+        type: optionss.cornersSquareOptions.type,
+        color: optionss.cornersSquareOptions.color,
+      },
+      cornersDotOptions: {
+        ...options.cornersDotOptions,
+        type: optionss.cornersDotOptions.type,
+        color: optionss.cornersDotOptions.color,
+      },
+      qrOptions: {
+        ...options.qrOptions,
+        errorCorrectionLevel: optionss.qrOptions.errorCorrectionLevel,
+      },
+    });
+    // console.log("create designOptions", optionss);
+  }, [optionss])
+
   const[showAlert, setShowAlert] = useState(false);
 
   const [open, setOpen] = useState(false);
@@ -186,9 +225,11 @@ const DesignOptions = forwardRef( ({
   const [designTypeNumber, setTypeNumber] = useState("0");
   const [designErrorCorrection, setErrorCorrection] = useState("");
 
+  const [trasnparentBg, setTrasnparentBg] = useState(false);
+
   // useEffect(() => {
-  //   console.log("options", JSON.stringify(options, null, 2));
-  // }, [options]);
+  //   console.log("optionsdsadasd", optionss);
+  // }, [optionss]);
 
   useEffect(() => {
     if( /^#[0-9A-F]{6}[0-9a-f]{0,2}$/i.test(designQRColor) && /^#[0-9A-F]{6}[0-9a-f]{0,2}$/i.test(designCornerSquareColor) && /^#[0-9A-F]{6}[0-9a-f]{0,2}$/i.test(designCornerDotColor) && /^#[0-9A-F]{6}[0-9a-f]{0,2}$/i.test(designQRBackgroundColor) ){
@@ -205,12 +246,23 @@ const DesignOptions = forwardRef( ({
   }, [designQRColor, designCornerSquareColor, designCornerDotColor, designQRBackgroundColor]);
 
   function handleLogoChange(event) {
-    setDesignLogo(event.target.files[0]);
+    // setDesignLogo(event.target.files[0]);
+    var file = event.target.files[0];
+    var reader = new FileReader();
+    reader.onloadend = function() {
+      // console.log('RESULT', reader.result)
+      setDesignLogo(reader.result);
+      setOptions((options) => ({
+        ...options,
+        image: reader.result,
+      }));
+    }
+    reader.readAsDataURL(file);
     setLogoSelected(event.target.files.length > 0);
-    setOptions((options) => ({
-      ...options,
-      image: URL.createObjectURL(event.target.files[0]),
-    }));
+    // setOptions((options) => ({
+    //   ...options,
+    //   image: URL.createObjectURL(event.target.files[0]),
+    // }));
   }
 
   const clearLogo = () => {
@@ -269,7 +321,7 @@ const DesignOptions = forwardRef( ({
       <DialogTrigger asChild>
         <Button variant="secondary">QR Design Options</Button>
       </DialogTrigger>
-      <DialogContent className="[&>button]:hidden flex justify-center items-center min-w-full w-full h-full fixed z-50 bg-black/80 p-10 sm:rounded-none sm:border-black/100" onInteractOutside={(e) => { e.preventDefault(); }}>
+      <DialogContent className="[&>button]:hidden flex justify-center items-center min-w-full w-full h-full fixed z-50 bg-black/80 p-10 sm:rounded-none border-none sm:border-black/100" onInteractOutside={(e) => { e.preventDefault(); }}>
         <Card className="lg:max-w-[1000px] w-[1000px] lg:max-h-[560px] h-[560px] p-6">
           <DialogHeader>
             <DialogTitle>QR Code Design</DialogTitle>
@@ -325,8 +377,8 @@ const DesignOptions = forwardRef( ({
               <Accordion type="single" collapsible> {/* QR Color */}
                 <AccordionItem value="item-1">
                   <AccordionTrigger className="no-underline">QR Color</AccordionTrigger>
-                  <AccordionContent>
-                    <div className="flex items-center gap-10">
+                  <AccordionContent className="w-full">
+                    <div className="flex items-center gap-10 w-full min-w-full">
                       <div className="flex items-center gap-1.5">
                         <Label className="text-sm text-muted-foreground font-normal mt-[5px]" htmlFor="picture">QR Code Color</Label>
                         <ColorPicker name="qrColor" className="mt-2 w-8 h-8 rounded-lg items-center"
@@ -352,21 +404,41 @@ const DesignOptions = forwardRef( ({
                           }}
                         />
                       </div>
-                      <div className="flex w-full max-w-sm items-center gap-1.5">
-                        <Label className="text-sm text-muted-foreground font-normal mt-[5px]" htmlFor="picture">QR Code Background Color</Label>
-                        <ColorPicker name="qrColor" className="mt-2 w-8 h-8 rounded-lg"
-                          value={designQRBackgroundColor}
-                          onChange={(v) => {
-                            setQRBackgroundColor(v);
+                      <div className="flex items-center mt-[5px] ml-[0px]">
+                        <Label className="text-sm text-muted-foreground font-normal mr-[5px]" htmlFor="picture">Transparent Background</Label>
+                        <Switch className='mt-[2px]'
+                          checked={trasnparentBg}
+                          onCheckedChange={(v) => {
+                            setTrasnparentBg(v);
                             setOptions((options) => ({
                               ...options,
                               backgroundOptions: {
                                 ...options.backgroundOptions,
-                                color: v,
+                                color: 'transparent',
                               },
                             }));
                           }}
                         />
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        { !trasnparentBg && (
+                          <div className='flex items-center'>
+                            <Label className="text-sm text-muted-foreground font-normal mt-[5px] mr-[5px]" htmlFor="picture">Background Color</Label>
+                            <ColorPicker name="qrColor" className="mt-2 w-8 h-8 rounded-lg"
+                              value={designQRBackgroundColor}
+                              onChange={(v) => {
+                                setQRBackgroundColor(v);
+                                setOptions((options) => ({
+                                  ...options,
+                                  backgroundOptions: {
+                                    ...options.backgroundOptions,
+                                    color: v,
+                                  },
+                                }));
+                              }}
+                            />
+                          </div>
+                        )}
                       </div>
                     </div>
                   </AccordionContent>
@@ -617,7 +689,7 @@ const DesignOptions = forwardRef( ({
                                 {designErrorCorrection.label}
                               </>
                             ) : (
-                              <>{errorCorrectionLevels[0].label}</>
+                              <>{errorCorrectionLevels[2].label}</>
                             )}
                           </Button>
                         </PopoverTrigger>

@@ -9,10 +9,14 @@ export async function GET(req) {
     const uid = searchParams.get("uid");
     console.log("🚀 ~ GET ~ uid:", uid)
     let qrcodes;
+    let design;
     if (uid) {
       qrcodes = await prisma.qRCode.findUnique({
         where: { unique_id : uid }
       });
+      design = await prisma.Design.findUnique({
+        where: { qr_unique_id : uid }
+      })
       if (!qrcodes) {
         return NextResponse.json({ error: "QR code not found" }, { status: 404 });
       }
@@ -23,7 +27,8 @@ export async function GET(req) {
         },
       });
     }
-    return NextResponse.json(qrcodes);
+    let reversePayload = {...qrcodes, ...design};
+    return NextResponse.json(reversePayload);
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error: "Error fetching QR codes" }, { status: 500 });

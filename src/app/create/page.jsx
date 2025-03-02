@@ -102,32 +102,32 @@ function CreateQRComponent() {
 
   const [qrImageSrc, setQrImageSrc] = useState("");
   const [payload, setPayload] = useState("");
-  const qrExperience = form.watch("qrExperience");
+  const qrExperience = form.watch("qrExperience");  
   const customDomain = form.watch("customDomain") || customDomains[0].value;
   const qrExperienceFromURL = useSearchParams().get("qr") || "url";
   const [designData, setDesignData] = useState({
-    width: 220,
-    height: 220,
-    type: "svg",
+    width: 220, //default
+    height: 220, //default
+    type: "svg", //default
     image: "",
     data: "https://example.com",
-    margin: 10,
+    margin: 10, //default
     qrOptions: {
-      typeNumber: "0",
-      mode: "Byte",
+      typeNumber: "0", //default
+      mode: "Byte", //default
       errorCorrectionLevel: "Q"
     },
     imageOptions: {
-      hideBackgroundDots: true,
-      imageSize: 0.4,
+      hideBackgroundDots: true, //default
+      imageSize: 0.4, 
       margin: 4,
-      crossOrigin: 'anonymous',
-      saveAsBlob: true,
+      crossOrigin: 'anonymous', //default
+      saveAsBlob: true, //default
     },
     dotsOptions: {
       type: "square",
       color: "#000000",
-      roundSize: true
+      roundSize: true //default
     },
     backgroundOptions: {
       round: 0,
@@ -165,7 +165,7 @@ function CreateQRComponent() {
       }
     },
     cornersDotOptions: {
-      type: "",
+      type: "square",
       color: "#000000"
     },
     cornersDotOptionsHelper: {
@@ -213,9 +213,7 @@ function CreateQRComponent() {
     var uidFromUrl = "";
     let uniqueId = values.qrCodeType==="dynamic" ? new Date().getTime().toString() : "sta" + new Date().getTime().toString() + "tic";
 
-    // let redirectionUrl = `https://qrgen-prod.vercel.app/api/redirect/${uniqueId}`; //prod url
     let redirectionUrl = `${customDomain}api/redirect/${uniqueId}`; //prod url
-    // console.log("🚀 ~ onSubmit ~ redirectionUrl:", redirectionUrl)
 
     if (values.qrCodeType === "dynamic" || values.qrExperience === "sms") {
       designData.data = redirectionUrl;
@@ -223,13 +221,13 @@ function CreateQRComponent() {
       designData.data = values.url.startsWith("http") ? values.url : `http://${values.url}`;
     }
     setPayload(designData);
-    // console.log("payload", payload);
 
     setTimeout( async () => {
       const canvas = await html2canvas(document.getElementById("qrImageDiv"));
       const dataUrl = canvas.toDataURL("image/png"); // Convert to base64;
       setQrImageSrc(dataUrl);
       const dbData = {
+        designData,
         ...values,
         uniqueId,
         qrCodeColor: designData.dotsOptions.color,
