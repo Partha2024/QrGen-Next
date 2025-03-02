@@ -30,7 +30,8 @@ function Manage() {
         throw new Error("Network response was not ok");
       }
       const result = await response.json();
-      const formattedData = result.map((qr) => {
+      const resultArray = Object.values(result);
+      const formattedData = resultArray.map((qr) => {
         const createdAtDate = new Date(qr.createdAt);
         const lastModifiedDate = new Date(qr.updatedAt);
         return {

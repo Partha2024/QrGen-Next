@@ -18,9 +18,11 @@ export async function POST(req) {
     qrImage,
     uniqueId,
     qrUrl,
-    customDomain
+    customDomain,
+    designData
   } = await req.json();
 
+  // console.log("designData", designData, designData.margin);
 
   // Validate required fields
   if ((!qrCodeName || !qrExperience || !qrCodeType)) {
@@ -76,11 +78,30 @@ export async function POST(req) {
         },
         data: updateData,
       });
+      await prisma.Design.update({
+        where: {
+          qr_unique_id: uidFromUrl,
+        },
+        data: {
+          image: designData.image || null,
+          imageOptions_imageSize: designData.imageOptions.imageSize,
+          imageOptions_margin: designData.imageOptions.margin,
+          dotsOptions_type: designData.dotsOptions.type,
+          dotsOptions_color: designData.dotsOptions.color,
+          backgroundOptions_color: designData.backgroundOptions.color,
+          cornersSquareOptions_type: designData.cornersSquareOptions.type,
+          cornersSquareOptions_color: designData.cornersSquareOptions.color,
+          cornersDotOptions_type: designData.cornersDotOptions.type,
+          cornersDotOptions_color: designData.cornersDotOptions.color,
+          qrOptions_errorCorrectionLevel: designData.qrOptions.errorCorrectionLevel,
+        },
+      });
       return NextResponse.json({
         // generatedQrCode: qrImage,
         // qrCodeUrl: qrUrl,
       });
     }else{
+      //creating new QR code into qr_code table
       const newQRCode = await prisma.qRCode.create({
         data: {
           unique_id: uniqueId,
@@ -97,8 +118,25 @@ export async function POST(req) {
           qr_domain: customDomain
         },
       });
+      //creating new row into design table
+      await prisma.Design.create({
+        data: {
+          qr_unique_id: uniqueId,
+          image: designData.image || null,
+          imageOptions_imageSize: designData.imageOptions.imageSize,
+          imageOptions_margin: designData.imageOptions.margin,
+          dotsOptions_type: designData.dotsOptions.type,
+          dotsOptions_color: designData.dotsOptions.color,
+          backgroundOptions_color: designData.backgroundOptions.color,
+          cornersSquareOptions_type: designData.cornersSquareOptions.type,
+          cornersSquareOptions_color: designData.cornersSquareOptions.color,
+          cornersDotOptions_type: designData.cornersDotOptions.type,
+          cornersDotOptions_color: designData.cornersDotOptions.color,
+          qrOptions_errorCorrectionLevel: designData.qrOptions.errorCorrectionLevel,
+        },
+      });
       return NextResponse.json({
-        // generatedQrCode: qrImage,
+        // generatedQrCode: qrImage,  
         // qrCodeUrl: qrUrl,
         // id: newQRCode.id,
         // identifier: uniqueId,
