@@ -1,7 +1,7 @@
 'use client';
 
 import './style.css';
-import { MoreHorizontal, ArrowUpDown, Pencil, Trash2, Eye } from "lucide-react";
+import { MoreHorizontal, ArrowUpDown, Pencil, Trash2, Eye, EyeClosed } from "lucide-react";
 import { useCallback } from 'react';
 
 import { Button } from "@/components/ui/button";
@@ -36,7 +36,7 @@ export const columns = (onDelete, onEdit) => [
       <div className="w-[20px] qrModalIcon">
         <HoverCard>
           <HoverCardTrigger>
-            <Eye className="size-5" strokeWidth={1.5} />
+            <EyeClosed className="size-4" strokeWidth={2} />
           </HoverCardTrigger>
           <HoverCardContent className="h-auto w-auto p-[10px]">
             <img src={row.original.qrCodeImage} alt="QR Code" className="w-[150px] h-[150px]" />

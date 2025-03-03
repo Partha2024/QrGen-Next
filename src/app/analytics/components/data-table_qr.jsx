@@ -43,8 +43,8 @@ export function DataTable({ columns, data, onDelete }) {
 
   return (
     <>
-      <div className="flex items-center py-2 pt-4 pb-4 justify-end pr-[15px] relative top-[-64px] ">
-        {/* <h3 className="text-2xl font-semibold">Top Scanned QR Codes</h3> */}
+      <div className="flex items-center py-2 pt-4 pb-4 justify-between pr-[15px]">
+        <h3 className="text-2xl font-semibold">Top Scanned QR Codes</h3>
         <Input
           className="max-w-sm border-slate-600"
           placeholder="Search QR Codes"
@@ -54,7 +54,7 @@ export function DataTable({ columns, data, onDelete }) {
           }
         />
       </div>
-      <div className="relative top-[-60px]">
+      <div>
       <Table className="w-full">
         <TableHeader className="w-full">
           {table.getHeaderGroups().map(headerGroup => (
@@ -88,7 +88,8 @@ export function DataTable({ columns, data, onDelete }) {
         </TableBody>
       </Table>
       </div>
-      <div className="flex items-center justify-end space-x-2 py-0 relative">
+      {/* <div className="flex items-center justify-end space-x-2 py-0 relative top-[-45px]"> */}
+      <div className="flex items-center justify-end space-x-2 py-0 mt-2">
         <Button
           variant="outline"
           size="sm"
