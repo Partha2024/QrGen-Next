@@ -40,14 +40,15 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { Trash2, AlertCircle } from "lucide-react";
-import ClientQR from "@/app/qr/ClientQR";
+// import ClientQR from "@/app/qr/ClientQR";
+import ClientQR from "@/app/create/component/ClientQR";
 import { ColorPicker } from '@/components/ui/color-picker';
 import {
   Alert,
   AlertDescription,
   AlertTitle,
 } from "@/components/ui/alert"
-
+import { toast } from "sonner"
 
 const dotShapes = [
   { value: "square", label: "Square" },
@@ -59,19 +60,19 @@ const dotShapes = [
 ]
 
 const errorCorrectionLevels = [
-  {value: "L", label: "L"},
-  {value: "M", label: "M"},
-  {value: "Q", label: "Q"},
-  {value: "H", label: "H"},
+  {value: "L", label: "L", imageSize: "1.2"},
+  {value: "M", label: "M", imageSize: "0.6"},
+  {value: "Q", label: "Q", imageSize: "0.4"},
+  {value: "H", label: "H", imageSize: "0.4"},
 ]
 
 const DesignOptions = forwardRef( ({
-  disabled, value, onChange, onBlur, name, className, optionss, ...props
+  disabled, value, onChange, onBlur, name, className, ...props
 }, forwardedRef) => {
 
   const contrast = require("get-contrast");
 
-  const [options, setOptions] = useState({
+  const [defaultOptions, setDefaultOptions] = useState({
     width: 220,
     height: 220,
     type: "svg",
@@ -128,7 +129,7 @@ const DesignOptions = forwardRef( ({
         color1: "#000000",
         color2: "#000000",
         rotation: "0"
-      } 
+      }
     },
     cornersDotOptions: {
       type: "Square",
@@ -162,43 +163,96 @@ const DesignOptions = forwardRef( ({
     }
   });
 
-  useEffect(() => {
-    //updating designDate with fetched data
-    setOptions({
-      ...options,
-      data: optionss.data,
-      image: optionss.image,
-      imageOptions: {
-        ...options.imageOptions,
-        imageSize: optionss.imageOptions.imageSize,
-        margin: optionss.imageOptions.margin
+  const [options, setOptions] = useState({
+    width: 220,
+    height: 220,
+    type: "svg",
+    image: "",
+    data: "https://example.com",
+    margin: 10,
+    qrOptions: {
+      typeNumber: "0",
+      mode: "Byte",
+      errorCorrectionLevel: "Q"
+    },
+    imageOptions: {
+      hideBackgroundDots: true,
+      imageSize: 0.4,
+      margin: 1,
+      crossOrigin: 'anonymous',
+      saveAsBlob: true,
+    },
+    dotsOptions: {
+      type: "square",
+      color: "#000000",
+      roundSize: true
+    },
+    backgroundOptions: {
+      round: 0,
+      color: "#fff"
+    },
+    dotsOptionsHelper: {
+      colorType: {
+        single: true,
+        gradient: false
       },
-      dotsOptions: {
-        ...options.dotsOptions,
-        color: optionss.dotsOptions.color,
-        type: optionss.dotsOptions.type,
+      gradient: {
+        linear: true,
+        radial: false,
+        color1: "#6a1a4c",
+        color2: "#6a1a4c",
+        rotation: "0"
+      }
+    },
+    cornersSquareOptions: {
+      type: "square",
+      color: "#000000",
+      gradient: null
+    },
+    cornersSquareOptionsHelper: {
+      colorType: {
+        single: true,
+        gradient: false
       },
-      backgroundOptions: {
-        ...options.backgroundOptions,
-        color: optionss.backgroundOptions.color,
+      gradient: {
+        linear: true,
+        radial: false,
+        color1: "#000000",
+        color2: "#000000",
+        rotation: "0"
+      }
+    },
+    cornersDotOptions: {
+      type: "Square",
+      color: "#000000"
+    },
+    cornersDotOptionsHelper: {
+      colorType: {
+        single: true,
+        gradient: false
       },
-      cornersSquareOptions: {
-        ...options.cornersSquareOptions,
-        type: optionss.cornersSquareOptions.type,
-        color: optionss.cornersSquareOptions.color,
+      gradient: {
+        linear: true,
+        radial: false,
+        color1: "#000000",
+        color2: "#000000",
+        rotation: "0"
+      }
+    },
+    backgroundOptionsHelper: {
+      colorType: {
+        single: true,
+        gradient: false
       },
-      cornersDotOptions: {
-        ...options.cornersDotOptions,
-        type: optionss.cornersDotOptions.type,
-        color: optionss.cornersDotOptions.color,
-      },
-      qrOptions: {
-        ...options.qrOptions,
-        errorCorrectionLevel: optionss.qrOptions.errorCorrectionLevel,
-      },
-    });
-    // console.log("create designOptions", optionss);
-  }, [optionss])
+      gradient: {
+        linear: true,
+        radial: false,
+        color1: "#ffffff",
+        color2: "#ffffff",
+        rotation: "0"
+      }
+    }
+  });
 
   const[showAlert, setShowAlert] = useState(false);
 
@@ -209,27 +263,25 @@ const DesignOptions = forwardRef( ({
 
   const [logoSelected, setLogoSelected] = useState(false);
   const [designLogo, setDesignLogo] = useState("");
-  const [designLogoMargin, setLogoMargin] = useState("4");
+  const [designLogoMargin, setLogoMargin] = useState("1");
   const [designLogoSize, setLogoSize] = useState("0.4");
 
-  const [designQRColor, setQRColor] = useState("#000");
+  const [designQRColor, setQRColor] = useState("#000000");
   const [designQRBackgroundColor, setQRBackgroundColor] = useState("#fff");
 
   const [designCornerSquareStyle, setCornerSquareStyle] = useState(null);
-  const [designCornerSquareColor, setCornerSquareColor] = useState("#000");
+  const [designCornerSquareColor, setCornerSquareColor] = useState("#000000");
   const [designCornerDotStyle, setCornerDotStyle] = useState(null);
-  const [designCornerDotColor, setCornerDotColor] = useState("#000");
+  const [designCornerDotColor, setCornerDotColor] = useState("#000000");
 
-  const [designDotsStyle, setDotsStyle] = useState("");
+  const [designDotsStyle, setDotsStyle] = useState("square");
 
   const [designTypeNumber, setTypeNumber] = useState("0");
-  const [designErrorCorrection, setErrorCorrection] = useState("");
+  const [designErrorCorrection, setErrorCorrection] = useState();
 
   const [trasnparentBg, setTrasnparentBg] = useState(false);
 
-  // useEffect(() => {
-  //   console.log("optionsdsadasd", optionss);
-  // }, [optionss]);
+  const [imageInput, setImageInput] = useState("");
 
   useEffect(() => {
     if( /^#[0-9A-F]{6}[0-9a-f]{0,2}$/i.test(designQRColor) && /^#[0-9A-F]{6}[0-9a-f]{0,2}$/i.test(designCornerSquareColor) && /^#[0-9A-F]{6}[0-9a-f]{0,2}$/i.test(designCornerDotColor) && /^#[0-9A-F]{6}[0-9a-f]{0,2}$/i.test(designQRBackgroundColor) ){
@@ -246,19 +298,28 @@ const DesignOptions = forwardRef( ({
   }, [designQRColor, designCornerSquareColor, designCornerDotColor, designQRBackgroundColor]);
 
   function handleLogoChange(event) {
-    // setDesignLogo(event.target.files[0]);
     var file = event.target.files[0];
-    var reader = new FileReader();
-    reader.onloadend = function() {
-      // console.log('RESULT', reader.result)
-      setDesignLogo(reader.result);
-      setOptions((options) => ({
-        ...options,
-        image: reader.result,
-      }));
+    if(file){
+      if(file.size > 1000000){
+        file.value = "";
+        event.target.value="";
+        toast.error("File Size Too Big", {
+          description: "Image size should be less then 1MB",
+        })
+      }else{
+        var reader = new FileReader();
+        reader.onloadend = function() {
+          setDesignLogo(reader.result);
+          setOptions((options) => ({
+            ...options,
+            image: reader.result,
+          }));
+        }
+        reader.readAsDataURL(file);
+        setLogoSelected(event.target.files.length > 0);
+      }
     }
-    reader.readAsDataURL(file);
-    setLogoSelected(event.target.files.length > 0);
+
     // setOptions((options) => ({
     //   ...options,
     //   image: URL.createObjectURL(event.target.files[0]),
@@ -316,6 +377,25 @@ const DesignOptions = forwardRef( ({
     if (onChange) onChange(options);
   }
 
+  function resetDesignData(){
+    setOptions(defaultOptions);
+    setLogoSelected(false);
+    setDesignLogo("");
+    setLogoMargin("1");
+    setLogoSize("0.4");
+    setQRColor("#000000");
+    setQRBackgroundColor("#ffffff");
+    setCornerSquareStyle(null);
+    setCornerSquareColor("#000000");
+    setCornerDotStyle(null);
+    setCornerDotColor("#000000");
+    setDotsStyle("square");
+    setTypeNumber("0");
+    setErrorCorrection();
+    setTrasnparentBg(false);
+    setImageInput("");
+  }
+
   return (
     <Dialog modal={false}>
       <DialogTrigger asChild>
@@ -338,38 +418,40 @@ const DesignOptions = forwardRef( ({
                           Insert Logo
                         </Label>
                         <div className="flex gap-2">
-                          <Input id="logoInput" disabled={logoSelected} type="file" className="w-[300px]" onChange={handleLogoChange}/>
+                          <Input id="logoInput" disabled={logoSelected} type="file" className="w-[300px]" onChange={handleLogoChange} accept="image/*"/>
                           <Button type="submit" onClick={clearLogo}><Trash2 /></Button>
                         </div>
                       </div>
-                      <div className='flex gap-2'>
-                        <div className="flex auto-row-2 w-full max-w-sm items-center gap-1.5">
-                          <Label className="text-sm text-muted-foreground font-normal" htmlFor="picture">Logo Size</Label>
-                          <Input className="w-[100px]"
-                            id="picture"
-                            type="number"
-                            min="0"
-                            max="1"
-                            step={0.1}
-                            value={designLogoSize}
-                            onChange={handleLogoSizeChange}
-                            disabled={!logoSelected}
-                          />
+                      {logoSelected && (
+                        <div className='flex gap-2'>
+                          <div className="flex auto-row-2 w-full max-w-sm items-center gap-1.5">
+                            <Label className="text-sm text-muted-foreground font-normal" htmlFor="picture">Logo Size</Label>
+                            <Input className="w-[100px]"
+                              id="picture"
+                              type="number"
+                              min="0.1"
+                              max="3"
+                              step={0.1}
+                              value={designLogoSize}
+                              onChange={handleLogoSizeChange}
+                              disabled={!logoSelected}
+                            />
+                          </div>
+                          <div className="flex w-full max-w-sm items-center gap-1.5">
+                            <Label className="text-sm text-muted-foreground font-normal" htmlFor="picture">Logo Margin</Label>
+                            <Input className="w-[100px]"
+                              id="form-image-margin"
+                              type="number"
+                              min="0"
+                              max="10"
+                              step={1}
+                              value={designLogoMargin}
+                              onChange={handleLogoMarginChange}
+                              disabled={!logoSelected}
+                            />
+                          </div>
                         </div>
-                        <div className="flex w-full max-w-sm items-center gap-1.5">
-                          <Label className="text-sm text-muted-foreground font-normal" htmlFor="picture">Logo Margin</Label>
-                          <Input className="w-[100px]"
-                            id="form-image-margin"
-                            type="number"
-                            min="0"
-                            max="10"
-                            step={1}
-                            value={designLogoMargin}
-                            onChange={handleLogoMarginChange}
-                            disabled={!logoSelected}
-                          />
-                        </div>
-                      </div>
+                      )}
                     </div>
                   </AccordionContent>
                 </AccordionItem>
@@ -713,6 +795,14 @@ const DesignOptions = forwardRef( ({
                                           errorCorrectionLevel: value
                                         },
                                       }));
+                                      setLogoSize(status.imageSize);
+                                      setOptions((options) => ({
+                                        ...options,
+                                        imageOptions: {
+                                          ...options.imageOptions,
+                                          imageSize: status.imageSize,
+                                        },
+                                      }));
                                       setOpen(false)
                                     }}
                                   >
@@ -747,7 +837,7 @@ const DesignOptions = forwardRef( ({
           </div>
           <DialogFooter className="mt-4">
             <DialogClose asChild>
-              <Button type="button" variant="outline" className="float-left">
+              <Button type="button" variant="outline" className="float-left" onClick={ resetDesignData }>
                 Cancel
               </Button>
             </DialogClose>

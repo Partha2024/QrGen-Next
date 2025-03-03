@@ -10,9 +10,9 @@ export default function AuthProvider({ children }) {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    // console.log("AuthProvider - token - " , token);
     if (token) {
-      setUser({ username: "admin" });
+      let userName = localStorage.getItem("username");
+      setUser({ username: userName });
     } else {
       setUser(null);
       router.push("/login");
@@ -33,6 +33,7 @@ export default function AuthProvider({ children }) {
       console.log("result", result)
       if (result.token) {
         localStorage.setItem("token", result.token);
+        localStorage.setItem("username", result.user.username);
         setUser({ username: result.user.username });
         router.push("/home");
       } else {
@@ -44,7 +45,7 @@ export default function AuthProvider({ children }) {
   };
 
   const logout = () => {
-    localStorage.removeItem("token");
+    localStorage.removeItem("token", "username");
     setUser(null);
     router.push("/login");
   };

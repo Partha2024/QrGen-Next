@@ -59,7 +59,6 @@ function Manage() {
   }
 
   const handleDelete = async (uniqueId) => {
-    
     try {
       const response = await fetch(`/api/deleteQr?id=${encodeURIComponent(uniqueId)}`, {
         method: "DELETE",
@@ -71,7 +70,8 @@ function Manage() {
           description: "QR Code Deleted Successfully!!",
         })
       }
-      await fetchData();
+      // await fetchData();
+      await window.location.reload(); // temporary fix of inaccessible datatable after deleting QR Code
     } catch (error) {
       console.error("Error deleting QR code:", error);
     }

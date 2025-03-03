@@ -1,5 +1,6 @@
 "use client";
 
+import './style.css';
 import { React, useEffect, useState, useCallback, useRef, useContext } from "react";
 import { AuthContext } from "@/components/AuthProvider";
 import { toPng } from 'html-to-image';
@@ -113,19 +114,19 @@ const scanOSConfig = {
     label: "Total Scans",
   },
   IOS: {
-    label: "Chrome",
+    label: "IOS",
     color: "hsl(var(--chart-1))",
   },
   Android: {
-    label: "Safari",
+    label: "Android",
     color: "hsl(var(--chart-2))",
   },
   Windows: {
-    label: "Firefox",
+    label: "Windows",
     color: "hsl(var(--chart-3))",
   },
-  MAC: {
-    label: "Edge",
+  Mac: {
+    label: "Mac",
     color: "hsl(var(--chart-4))",
   },
   other: {
@@ -259,7 +260,7 @@ function Analytics() {
       setScanByScansDayOfWeek(scansByDayOfWeekFormattedData);
 
       const scansByOSFormattedData = Array.from({ length: 5 }, (_, os) => {
-        const osNames = ["IOS", "Android", "Windows", "MAC", "Linux"];
+        const osNames = ["IOS", "Android", "Windows", "Mac", "Linux"];
         const osName = osNames[os];
         const existingData = result.scanByOS.find(
           (item) => item.os === osName
@@ -344,6 +345,19 @@ function Analytics() {
   useEffect(() => {
     fetchData();
   }, []);
+
+  // var thisCard = document.getElementById("thisCard");
+  // useEffect(() => {
+  //   thisDivFunction();
+  // }, [thisCard]);
+  
+  // function thisDivFunction(){
+  //   if(thisCard){
+  //     setTimeout(() => {
+  //       thisCard.setAttribute("style", `height: ${thisCard.offsetHeight-45}px`);
+  //     },1000)
+  //   }
+  // }
 
   return (
     <>
@@ -714,6 +728,7 @@ function Analytics() {
                         <LoaderCircle className="loadingSpinner mx-auto my-auto w-6" />
                       ) : (
                         <BarChart
+                          id="overflow-visible"
                           accessibilityLayer
                           data={topTenScannedQrCodes}
                           layout="vertical"
@@ -729,6 +744,7 @@ function Analytics() {
                             tickMargin={0}
                             axisLine={false}
                             width={200}
+                            tickFormatter={(value) => value.slice(0, 24)}
                           />
                           <ChartTooltip
                             cursor={false}
@@ -741,7 +757,7 @@ function Analytics() {
                           >
                             <LabelList
                               position="right"
-                              offset={12}
+                              offset={6}
                               className="fill-foreground"
                               fontSize={12}
                               />
@@ -758,7 +774,7 @@ function Analytics() {
                   <CardContent className="pb-0 pl-4">
                     <ChartContainer
                       config={topTenQRByUniqueUsersChartConfig}
-                      className=" min-h-[200px] h-[245px] w-full"
+                      className="min-h-[200px] h-[245px] w-full"
                     >
                       {loading ? (
                         <LoaderCircle className="loadingSpinner mx-auto my-auto w-6" />
@@ -770,6 +786,7 @@ function Analytics() {
                           margin={{
                             left: -50,
                           }}
+                          id="overflow-visible"
                         >
                           <XAxis type="number" dataKey="unique_users" hide />
                           <YAxis
@@ -779,7 +796,7 @@ function Analytics() {
                             tickMargin={0}
                             axisLine={false}
                             width={200}
-                            // tickFormatter={(value) => value.slice(0, 3)}
+                            tickFormatter={(value) => value.slice(0, 24)}
                           />
                           <ChartTooltip
                             cursor={false}
@@ -789,10 +806,11 @@ function Analytics() {
                             dataKey="unique_users"
                             fill="var(--color-unique_users)"
                             radius={5}
+
                           >
                             <LabelList
                               position="right"
-                              offset={12}
+                              offset={6}
                               className="fill-foreground"
                               fontSize={12}
                               />
@@ -957,15 +975,17 @@ function Analytics() {
                 <DataTable title={"Top 10 Scanning Cities"} columns={columns} data={data}>
                 </DataTable> */}
               </div>
-                <Card>
-                  <CardHeader className="pl-6 pt-6 pb-4">
-                    <CardTitle>Top Scanned QR Codes</CardTitle>
-                  </CardHeader>
+                <Card id="thisCard">
+                  {loading && (
+                    <CardHeader className="pl-6 pt-6 pb-4">
+                      <CardTitle>Top Scanned QR Codes</CardTitle>
+                    </CardHeader>
+                  )}
                   <CardContent>
                     {loading ? (
                       <LoaderCircle className="loadingSpinner mx-auto" />
                     ) : (
-                      <DataTable className="rounded-lg border bg-card text-card-foreground shadow-sm" columns={columns(handleDelete, handleEdit)} data={data} />
+                      <DataTable className="rounded-lg border bg-card text-card-foreground shadow-sm" columns={columns()} data={data} />
                     )}
                   </CardContent>
                 </Card>

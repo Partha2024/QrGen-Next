@@ -51,7 +51,7 @@ import html2canvas from "html2canvas";
 import { cn } from "@/lib/utils";
 // import ImageTracer from "image-tracer-js";
 import ImageTracer from "imagetracerjs";
-import { DesignOptions } from "@/app/create/component/designOptions";
+import { DesignOptions } from "@/app/edit/component/designOptions";
 import ClientQR from "@/app/edit/component/ClientQR";
 import { saveAs } from "file-saver";
 
