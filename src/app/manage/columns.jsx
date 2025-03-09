@@ -133,7 +133,7 @@ export const columns = (onDelete, onEdit) => [
               <DropdownMenuItem className="editOption cursor-pointer" onClick={() => onEdit(row.original.id)}>
                 <Pencil strokeWidth={1.5} /> Edit
               </DropdownMenuItem>
-              <AlertDialogTrigger asChild className='w-[118px]'>
+              <AlertDialogTrigger className='w-[118px]'>
                 <DropdownMenuItem className="deleteOption cursor-pointer">
                   <Trash2 /> Delete
                 </DropdownMenuItem>

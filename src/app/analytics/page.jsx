@@ -16,14 +16,13 @@ import {
   LabelList,
 } from "recharts";
 import {
-  ChartConfig,
   ChartContainer,
   ChartLegend,
   ChartLegendContent,
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { addDays, format } from "date-fns"
+import { format } from "date-fns"
 import {
   Select,
   SelectContent,
@@ -31,28 +30,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { checkPrimeSync } from "crypto";
-import { LoaderCircle, QrCode, ScanQrCode, ListFilterPlus, ScanLine, Users, Filter, Calendar as CalendarIcon } from "lucide-react";
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { Tabs, TabsContent } from "@/components/ui/tabs";
+import { LoaderCircle, QrCode, ScanQrCode, ScanLine, Users, Filter, Calendar as CalendarIcon } from "lucide-react";
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { DateRange } from "react-day-picker"
-import { Payment, columns } from "./components/columns_qr";
+import { columns } from "./components/columns_qr";
 import { DataTable } from "./components/data-table_qr";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion"
+import { toast } from "sonner"
 import { cn } from "@/lib/utils"
 import { Calendar } from "@/components/ui/calendar"
 import { AutoComplete } from "./components/autocomplete"
@@ -62,13 +51,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
-// import { CalendarDateRangePicker } from "./components/date-range-picker"
-// import { MainNav } from "./components/main-nav"
-// import { Overview } from "./components/overview"
-// import { RecentSales } from "./components/recent-sales"
-// import { Search } from "./components/search"
-// import TeamSwitcher from "./components/team-switcher"
-// import { UserNav } from "./components/user-nav"
 
 const chartConfig = {
   scans: {
@@ -183,7 +165,6 @@ function Analytics() {
   const fetchData = async () => {
     setLoading(true);
     try {
-
       const payload = {
         dateRange: date,
         qrCodeName: selectedValue_qr,
@@ -201,6 +182,14 @@ function Analytics() {
         body: JSON.stringify(payload),
       });
       if (!response.ok) {
+        setLoading(true);
+        toast.error("Network Response Was Not Ok!!", {
+          style: {
+            color: '#e60000',
+            background: '#fff0f0',
+            borderColor: '#ffe0e1',
+          },
+        })
         throw new Error("Network response was not ok");
       }
       const result = await response.json();
@@ -286,11 +275,14 @@ function Analytics() {
       setQRCodesCountry(result.qrCodesCountry);
       setQRCodesState(result.qrCodesState);
       setQRCodesCity(result.qrCodesCity);
-    } catch (error) {
-      console.error("Error fetching QR codes:", error);
-    } finally {
       setLoading(false);
-    }
+    } catch (error) {
+      setLoading(true);
+      console.error("Error fetching QR codes:", error);
+    } 
+    // finally {
+    //   setLoading(false);
+    // }
   };
 
   const filteredData = scanTimeLineData.filter((item) => {

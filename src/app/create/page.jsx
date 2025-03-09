@@ -28,7 +28,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Separator } from "@/components/ui/separator";
 import html2canvas from "html2canvas";
 import { cn } from "@/lib/utils"
-import { toast } from "sonner"
+import { toast } from "sonner";
 import { DesignOptions } from "@/app/create/component/designOptions";
 import ClientQR from "@/app/create/component/ClientQR";
 
@@ -119,8 +119,8 @@ function CreateQRComponent() {
     },
     imageOptions: {
       hideBackgroundDots: true, //default
-      imageSize: 0.4, 
-      margin: 4,
+      imageSize: "0.4", 
+      margin: "4",
       crossOrigin: 'anonymous', //default
       saveAsBlob: true, //default
     },
@@ -248,12 +248,25 @@ function CreateQRComponent() {
         });
         if (response.ok) {
           // console.log("QR Code generated:");
-          toast("Success!!", {
+          toast.success("Success!!", {
             description: "QR Code Created Successfully",
+            style: {
+              color: '#008a2e',
+              background: '#ecfdf3',
+              borderColor: '#bffcd9',
+            },  
           })
           window.location.href = "/edit?uid=" + uniqueId;
           setOnSubmitLoader(true);
         } else {
+          setOnSubmitLoader(false);
+          toast.error("Error Creating QR Code!!", {
+            style: {
+              color: '#e60000',
+              background: '#fff0f0',
+              borderColor: '#ffe0e1',
+            },
+          })
           console.error("Failed to generate QR code:", await response.text());
         }
       } catch (error) {
