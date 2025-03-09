@@ -118,12 +118,6 @@ const customDomains = [
 
 //created an seperate function because of suspense issue
 function EditQRComponent() {
-  const [qrCodeName, setQrCodeName] = useState("qrcode");
-  const [qrCodeTypeEx, setQrCodeTypeEx] = useState("");
-  const [isUpdated, setIsUpdated] = useState("false");
-  const [customDomain, setCustomDomain] = useState("");
-  const [qrUrl, setQrUrl] = useState("");
-  // const customDomain = form.watch("customDomain") || customDomains[0].value;
 
   //defining form and default values
   const form = useForm({
@@ -140,6 +134,13 @@ function EditQRComponent() {
       qrCodeBackgroundColor: "#ffffff",
     },
   });
+
+  const [qrCodeName, setQrCodeName] = useState("qrcode");
+  const [qrCodeTypeEx, setQrCodeTypeEx] = useState("");
+  const [isUpdated, setIsUpdated] = useState("false");
+  const [customDomain, setCustomDomain] = useState("");
+  const [qrUrl, setQrUrl] = useState("");
+  // const customDomain = form.watch("customDomain") || customDomains[0].value;
 
   const [loading, setLoading] = useState(true);
   const [qrImageSrc, setQrImageSrc] = useState("");
@@ -161,7 +162,7 @@ function EditQRComponent() {
     },
     imageOptions: {
       hideBackgroundDots: true,
-      imageSize: 0.4,
+      imageSize: "0.4",
       margin: 4,
       crossOrigin: "anonymous",
       saveAsBlob: true,
@@ -252,6 +253,13 @@ function EditQRComponent() {
       let url = `/api/getQrData?uid=${encodeURIComponent(uid)}`;
       const response = await fetch(url);
       if (!response.ok) {
+        toast.error("QR Code Not Found!!!", {
+          style: {
+            color: '#e60000',
+            background: '#fff0f0',
+            borderColor: '#ffe0e1',
+          },
+        })        
         throw new Error("Error fetching QR codes");
       }
       // Parse and return the JSON response
@@ -366,12 +374,25 @@ function EditQRComponent() {
           body: JSON.stringify(dbData),
         });
         if (response.ok) {
-          setIsUpdated(false);
+          // setIsUpdated(false);
           setOnSubmitLoader(false);
-          toast("Success!!", {
+          toast.success("Success!!", {
             description: "QR Code Updated Successfully",
+            style: {
+              color: '#008a2e',
+              background: '#ecfdf3',
+              borderColor: '#bffcd9',
+            },  
           });
         } else {
+          setOnSubmitLoader(true);
+          toast.error("Failed to Update QR code!!!", {
+            style: {
+              color: '#e60000',
+              background: '#fff0f0',
+              borderColor: '#ffe0e1',
+            },
+          })
           console.error("Failed to Update QR code(F):", await response.text());
         }
       } catch (error) {

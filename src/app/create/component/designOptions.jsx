@@ -86,8 +86,8 @@ const DesignOptions = forwardRef( ({
     },
     imageOptions: {
       hideBackgroundDots: true,
-      imageSize: 0.4,
-      margin: 4,
+      imageSize: "0.4",
+      margin: "4",
       crossOrigin: 'anonymous',
       saveAsBlob: true,
     },
@@ -177,8 +177,8 @@ const DesignOptions = forwardRef( ({
     },
     imageOptions: {
       hideBackgroundDots: true,
-      imageSize: 0.4,
-      margin: 1,
+      imageSize: "0.4",
+      margin: "1",
       crossOrigin: 'anonymous',
       saveAsBlob: true,
     },
@@ -319,11 +319,6 @@ const DesignOptions = forwardRef( ({
         setLogoSelected(event.target.files.length > 0);
       }
     }
-
-    // setOptions((options) => ({
-    //   ...options,
-    //   image: URL.createObjectURL(event.target.files[0]),
-    // }));
   }
 
   const clearLogo = () => {

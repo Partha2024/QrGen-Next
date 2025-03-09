@@ -47,7 +47,7 @@ import {
   AlertDescription,
   AlertTitle,
 } from "@/components/ui/alert"
-
+import { toast } from "sonner"
 
 const dotShapes = [
   { value: "square", label: "Square" },
@@ -59,10 +59,10 @@ const dotShapes = [
 ]
 
 const errorCorrectionLevels = [
-  {value: "L", label: "L"},
-  {value: "M", label: "M"},
-  {value: "Q", label: "Q"},
-  {value: "H", label: "H"},
+  {value: "L", label: "L", imageSize: "1.2"},
+  {value: "M", label: "M", imageSize: "0.6"},
+  {value: "Q", label: "Q", imageSize: "0.4"},
+  {value: "H", label: "H", imageSize: "0.4"},
 ]
 
 const DesignOptions = forwardRef( ({
@@ -85,8 +85,8 @@ const DesignOptions = forwardRef( ({
     },
     imageOptions: {
       hideBackgroundDots: true,
-      imageSize: 0.4,
-      margin: 4,
+      imageSize: "0.4",
+      margin: "4",
       crossOrigin: 'anonymous',
       saveAsBlob: true,
     },
@@ -160,10 +160,49 @@ const DesignOptions = forwardRef( ({
         rotation: "0"
       }
     }
-  });
+  }); //default design options
+  const[showAlert, setShowAlert] = useState(false); //show alert if contrast ratio is less than 3
+  const [open, setOpen] = useState(false);
+  const [open2, setOpen2] = useState(false);
+  const [open3, setOpen3] = useState(false);
+  const [open4, setOpen4] = useState(false);
+  const [logoSelected, setLogoSelected] = useState(false);  //check if user has chosen a logo
+  const [designLogo, setDesignLogo] = useState("");   //logo
+  const [designLogoMargin, setLogoMargin] = useState("4");    //logo margin
+  const [designLogoSize, setLogoSize] = useState("0.4");    //logo size
+  const [designQRColor, setQRColor] = useState("#000000");     //dots color
+  const [designQRBackgroundColor, setQRBackgroundColor] = useState("#ffffff");    //background color
+  const [designCornerSquareStyle, setCornerSquareStyle] = useState({ value: "square", label: "Square" });     //corner square style
+  const [designCornerSquareColor, setCornerSquareColor] = useState("#000000");    //corner square color 
+  const [designCornerDotStyle, setCornerDotStyle] = useState({ value: "square", label: "Square" });     //corner dot style
+  const [designCornerDotColor, setCornerDotColor] = useState("#000000");    //corner dot color
+  const [designDotsStyle, setDotsStyle] = useState({ value: "square", label: "Square" });     //dots style 
+  const [designTypeNumber, setTypeNumber] = useState("0");  
+  const [designErrorCorrection, setErrorCorrection] = useState({value: "Q", label: "Q"}); //error correction level
+  const [trasnparentBg, setTrasnparentBg] = useState(false);  //transparent background
 
   useEffect(() => {
+    setResetDesignData();
+  }, [optionss])
+
+  function setResetDesignData(){
     //updating designDate with fetched data
+    setErrorCorrection({value: optionss.qrOptions.errorCorrectionLevel, label: optionss.qrOptions.errorCorrectionLevel});
+    setQRColor(optionss.dotsOptions.color)
+    if(optionss.backgroundOptions.color === 'transparent') {
+      setTrasnparentBg(true);
+    }else{
+      setQRBackgroundColor(optionss.backgroundOptions.color)
+    }
+    setDotsStyle({ value: optionss.dotsOptions.type, label: optionss.dotsOptions.type });  
+    setCornerSquareStyle({ value: optionss.cornersSquareOptions.type, label: optionss.cornersSquareOptions.type });
+    setCornerSquareColor(optionss.cornersSquareOptions.color);
+    setCornerDotStyle({ value: optionss.cornersDotOptions.type, label: optionss.cornersDotOptions.type });
+    setCornerDotColor(optionss.cornersDotOptions.color);
+    setDesignLogo(optionss.image)
+    setLogoMargin(optionss.imageOptions.margin)
+    setLogoSize(optionss.imageOptions.imageSize)
+    if(optionss.image !== null) setLogoSelected(true);
     setOptions({
       ...options,
       data: optionss.data,
@@ -197,35 +236,7 @@ const DesignOptions = forwardRef( ({
         errorCorrectionLevel: optionss.qrOptions.errorCorrectionLevel,
       },
     });
-    // console.log("create designOptions", optionss);
-  }, [optionss])
-
-  const[showAlert, setShowAlert] = useState(false);
-
-  const [open, setOpen] = useState(false);
-  const [open2, setOpen2] = useState(false);
-  const [open3, setOpen3] = useState(false);
-  const [open4, setOpen4] = useState(false);
-
-  const [logoSelected, setLogoSelected] = useState(false);
-  const [designLogo, setDesignLogo] = useState("");
-  const [designLogoMargin, setLogoMargin] = useState("4");
-  const [designLogoSize, setLogoSize] = useState("0.4");
-
-  const [designQRColor, setQRColor] = useState("#000");
-  const [designQRBackgroundColor, setQRBackgroundColor] = useState("#fff");
-
-  const [designCornerSquareStyle, setCornerSquareStyle] = useState(null);
-  const [designCornerSquareColor, setCornerSquareColor] = useState("#000");
-  const [designCornerDotStyle, setCornerDotStyle] = useState(null);
-  const [designCornerDotColor, setCornerDotColor] = useState("#000");
-
-  const [designDotsStyle, setDotsStyle] = useState("");
-
-  const [designTypeNumber, setTypeNumber] = useState("0");
-  const [designErrorCorrection, setErrorCorrection] = useState("");
-
-  const [trasnparentBg, setTrasnparentBg] = useState(false);
+  }
 
   // useEffect(() => {
   //   console.log("optionsdsadasd", optionss);
@@ -246,23 +257,27 @@ const DesignOptions = forwardRef( ({
   }, [designQRColor, designCornerSquareColor, designCornerDotColor, designQRBackgroundColor]);
 
   function handleLogoChange(event) {
-    // setDesignLogo(event.target.files[0]);
     var file = event.target.files[0];
-    var reader = new FileReader();
-    reader.onloadend = function() {
-      // console.log('RESULT', reader.result)
-      setDesignLogo(reader.result);
-      setOptions((options) => ({
-        ...options,
-        image: reader.result,
-      }));
+    if(file){
+      if(file.size > 1000000){
+        file.value = "";
+        event.target.value="";
+        toast.error("File Size Too Big", {
+          description: "Image size should be less then 1MB",
+        })
+      }else{
+        var reader = new FileReader();
+        reader.onloadend = function() {
+          setDesignLogo(reader.result);
+          setOptions((options) => ({
+            ...options,
+            image: reader.result,
+          }));
+        }
+        reader.readAsDataURL(file);
+        setLogoSelected(event.target.files.length > 0);
+      }
     }
-    reader.readAsDataURL(file);
-    setLogoSelected(event.target.files.length > 0);
-    // setOptions((options) => ({
-    //   ...options,
-    //   image: URL.createObjectURL(event.target.files[0]),
-    // }));
   }
 
   const clearLogo = () => {
@@ -338,7 +353,7 @@ const DesignOptions = forwardRef( ({
                           Insert Logo
                         </Label>
                         <div className="flex gap-2">
-                          <Input id="logoInput" disabled={logoSelected} type="file" className="w-[300px]" onChange={handleLogoChange}/>
+                          <Input id="logoInput" disabled={logoSelected} type="file" className="w-[300px]" onChange={handleLogoChange} accept="image/*"/>
                           <Button type="submit" onClick={clearLogo}><Trash2 /></Button>
                         </div>
                       </div>
@@ -349,11 +364,11 @@ const DesignOptions = forwardRef( ({
                             id="picture"
                             type="number"
                             min="0"
-                            max="1"
+                            max="3"
                             step={0.1}
                             value={designLogoSize}
                             onChange={handleLogoSizeChange}
-                            disabled={!logoSelected}
+                            // disabled={!logoSelected}
                           />
                         </div>
                         <div className="flex w-full max-w-sm items-center gap-1.5">
@@ -366,7 +381,7 @@ const DesignOptions = forwardRef( ({
                             step={1}
                             value={designLogoMargin}
                             onChange={handleLogoMarginChange}
-                            disabled={!logoSelected}
+                            // disabled={!logoSelected}
                           />
                         </div>
                       </div>
@@ -706,6 +721,14 @@ const DesignOptions = forwardRef( ({
                                         errorCorrectionLevels.find((priority) => priority.value === value) ||
                                           null
                                       )
+                                      setLogoSize(status.imageSize);
+                                      setOptions((options) => ({
+                                        ...options,
+                                        imageOptions: {
+                                          ...options.imageOptions,
+                                          imageSize: status.imageSize,
+                                        },
+                                      }));
                                       setOptions((options) => ({
                                         ...options,
                                         qrOptions: {
@@ -747,7 +770,7 @@ const DesignOptions = forwardRef( ({
           </div>
           <DialogFooter className="mt-4">
             <DialogClose asChild>
-              <Button type="button" variant="outline" className="float-left">
+              <Button type="button" variant="outline" className="float-left" onClick={ setResetDesignData }>
                 Cancel
               </Button>
             </DialogClose>

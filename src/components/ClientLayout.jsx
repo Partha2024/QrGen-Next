@@ -16,7 +16,7 @@ export default function ClientLayout({ children }) {
         {user && <SidebarTrigger className="absolute" />}
         {children}
       </main>
-      <Toaster />
+      <Toaster richColors />
     </>
   );
 }
