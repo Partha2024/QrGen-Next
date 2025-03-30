@@ -1,7 +1,7 @@
 "use client";
 import { createContext, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-
+import { toast } from "sonner";
 export const AuthContext = createContext();
 
 export default function AuthProvider({ children }) {
@@ -37,10 +37,23 @@ export default function AuthProvider({ children }) {
         setUser({ username: result.user.username });
         router.push("/home");
       } else {
-        alert("Invalid credentials");
+        toast.error("Invalid Username or Password", {
+          style: {
+            color: '#e60000',
+            background: '#fff0f0',
+            borderColor: '#ffe0e1',
+          }
+        })
       }
     } catch (error) {
-      console.error("Error fetching QR codes:", error);
+      toast.error("Network Response Was Not Ok!!", {
+        style: {
+          color: '#e60000',
+          background: '#fff0f0',
+          borderColor: '#ffe0e1',
+        }
+      })
+      console.error("Error validating user:", error);
     }
   };
 
