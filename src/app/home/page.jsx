@@ -32,12 +32,12 @@ export default function HomePage() {
             </em>
             SMS
           </Button>
-          <Button variant="outline" className="options">
+          {/* <Button variant="outline" className="options">
             <em>
               <MessageSquareMore />
             </em>
             Bulk
-          </Button>
+          </Button> */}
         </div>     
       </section>
     </main>

@@ -7,6 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { LoaderCircle } from "lucide-react"
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useContext, useState } from "react";
@@ -17,10 +18,21 @@ export default function LoginForm() {
   const { login } = useContext(AuthContext);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [onSubmitLoader, setOnSubmitLoader] = useState(false);
 
   const handleSubmit = async (e) => {
+    setOnSubmitLoader(true)
     e.preventDefault();
-    await login(email, password);
+    try {
+      const response = await login(email, password);
+      if (!response || response.error) {
+        console.log("this is re",response?.error);
+        throw new Error(response?.error);
+      }
+    } catch (error) {
+    } finally {
+      setOnSubmitLoader(false);
+    }
   };
 
   return (
@@ -65,8 +77,8 @@ export default function LoginForm() {
                   required
                 />
               </div>
-              <Button type="submit" className="w-full">
-                Login
+              <Button type="submit" className="w-full" disabled={onSubmitLoader}>
+                Login {onSubmitLoader && <LoaderCircle className="loadingSpinner ml-1" />} 
               </Button>
               {/* <Button variant="outline" className="w-full">
                 Login with Google

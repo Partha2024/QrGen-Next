@@ -31,7 +31,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
-import { LoaderCircle, QrCode, ScanQrCode, ScanLine, Users, Filter, Calendar as CalendarIcon } from "lucide-react";
+import { LoaderCircle, TriangleAlert, QrCode, ScanQrCode, ScanLine, Users, Filter, Calendar as CalendarIcon } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -131,6 +131,7 @@ function Analytics() {
   const ref = useRef(null);
 
   const [loading, setLoading] = useState(true);
+  const [loadingError, setLoadingError] = useState(false);
   const [timeRange, setTimeRange] = useState("90d");
 
   const [qrCodesNames, setQRCodesNames] = useState({});
@@ -183,6 +184,7 @@ function Analytics() {
       });
       if (!response.ok) {
         setLoading(true);
+        setLoadingError(true);
         toast.error("Network Response Was Not Ok!!", {
           style: {
             color: '#e60000',
@@ -249,7 +251,7 @@ function Analytics() {
       setScanByScansDayOfWeek(scansByDayOfWeekFormattedData);
 
       const scansByOSFormattedData = Array.from({ length: 5 }, (_, os) => {
-        const osNames = ["IOS", "Android", "Windows", "Mac", "Linux"];
+        const osNames = ["iOS", "Android", "Windows", "Mac", "Linux"];
         const osName = osNames[os];
         const existingData = result.scanByOS.find(
           (item) => item.os === osName
@@ -505,7 +507,7 @@ function Analytics() {
                     </CardHeader>
                     <CardContent>
                       <div className="text-2xl font-bold">
-                        {loading ? (
+                        {loading ? ( loadingError ? ( <TriangleAlert className="mt-2 mx-auto" size={24} color="#e60000" /> ) : 
                           <LoaderCircle className="loadingSpinner mx-auto" />
                         ) : (
                           totalQrCodes
@@ -524,7 +526,7 @@ function Analytics() {
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold">
-                      {loading ? (
+                      {loading ? ( loadingError ? ( <TriangleAlert className="mt-2 mx-auto" size={24} color="#e60000" /> ) : 
                         <LoaderCircle className="loadingSpinner mx-auto" />
                       ) : (
                         totalScans
@@ -545,7 +547,7 @@ function Analytics() {
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold">
-                      {loading ? (
+                      {loading ? ( loadingError ? ( <TriangleAlert className="mt-2 mx-auto" size={24} color="#e60000" /> ) : 
                         <LoaderCircle className="loadingSpinner mx-auto" />
                       ) : (
                         uniqueUsers
@@ -566,7 +568,7 @@ function Analytics() {
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold">
-                      {loading ? (
+                      {loading ? ( loadingError ? ( <TriangleAlert className="mt-2 mx-auto" size={24} color="#e60000" /> ) : 
                         <LoaderCircle className="loadingSpinner mx-auto mt-[9px]" />
                       ) : (
                         averageScanPerUser
@@ -610,7 +612,7 @@ function Analytics() {
                       config={chartConfig}
                       className="aspect-auto h-[250px] w-full"
                     >
-                      {loading ? (
+                      {loading ? ( loadingError ? ( <TriangleAlert className="w-6 mx-auto" color="#e60000" /> ) : 
                         <LoaderCircle className="loadingSpinner mx-auto w-6" />
                       ) : (
                         <AreaChart data={filteredData}>
@@ -716,7 +718,7 @@ function Analytics() {
                       config={topTenScannedQRChartConfig}
                       className=" min-h-[200px] h-[245px] w-full"
                     >
-                      {loading ? (
+                      {loading ? ( loadingError ? ( <TriangleAlert className="w-6 mx-auto" color="#e60000" /> ) : 
                         <LoaderCircle className="loadingSpinner mx-auto my-auto w-6" />
                       ) : (
                         <BarChart
@@ -768,7 +770,7 @@ function Analytics() {
                       config={topTenQRByUniqueUsersChartConfig}
                       className="min-h-[200px] h-[245px] w-full"
                     >
-                      {loading ? (
+                      {loading ? ( loadingError ? ( <TriangleAlert className="w-6 mx-auto" color="#e60000" /> ) : 
                         <LoaderCircle className="loadingSpinner mx-auto my-auto w-6" />
                       ) : (
                         <BarChart
@@ -821,7 +823,7 @@ function Analytics() {
                       config={scanByTimeOfDayConfig}
                       className="min-h-[200px] h-[250px] w-full"
                     >
-                      {loading ? (
+                      {loading ? ( loadingError ? ( <TriangleAlert className="w-6 mx-auto" size={20} color="#e60000" /> ) : 
                         <LoaderCircle className="loadingSpinner mx-auto w-6" />
                       ) : (
 
@@ -870,7 +872,7 @@ function Analytics() {
                       config={scanByDayOfWeekConfig}
                       className="min-h-[200px] h-[200px] w-full"
                     >
-                      {loading ? (
+                      {loading ? ( loadingError ? ( <TriangleAlert className="w-6 mx-auto" color="#e60000" /> ) : 
                         <LoaderCircle className="loadingSpinner mx-auto w-6" />
                       ) : (
                         <BarChart
@@ -920,7 +922,7 @@ function Analytics() {
                       config={scanOSConfig}
                       className="min-h-[200px] h-[200px] w-full"
                     >
-                      {loading ? (
+                      {loading ? ( loadingError ? ( <TriangleAlert className="w-6 mx-auto" color="#e60000" /> ) : 
                         <LoaderCircle className="loadingSpinner mx-auto w-6" />
                       ) : (
                         <BarChart
@@ -974,7 +976,7 @@ function Analytics() {
                     </CardHeader>
                   )}
                   <CardContent>
-                    {loading ? (
+                    {loading ? ( loadingError ? ( <TriangleAlert className="w-6 mx-auto" color="#e60000" /> ) : 
                       <LoaderCircle className="loadingSpinner mx-auto" />
                     ) : (
                       <DataTable className="rounded-lg border bg-card text-card-foreground shadow-sm" columns={columns()} data={data} />
