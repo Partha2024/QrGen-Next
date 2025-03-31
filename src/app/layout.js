@@ -1,9 +1,10 @@
 import "./globals.css";
 import { SidebarProvider } from "@/components/ui/sidebar"
-import { Poppins } from "next/font/google";
+import { Poppins, Ubuntu } from "next/font/google";
 import AuthProvider from "@/components/AuthProvider";
 import ClientLayout from "@/components/ClientLayout";
 import { SpeedInsights } from "@vercel/speed-insights/next"
+import { ThemeProvider } from "@/components/theme-provider"
 
 export const metadata = {
   title: "QRGen",
@@ -17,32 +18,31 @@ const poppins = Poppins({
   display: "swap",
 });
 
+const ubuntu = Ubuntu({
+  weight: ["400", "500"],
+  subsets: ["cyrillic"],
+  display: "block",
+});
+
 export default function RootLayout({ children }) {  
   return (
-    // <html
-    //   lang="en" className={`${poppins.className}`}
-    // >
-    //   <body className={`antialiased`}>
-    //     <AuthProvider>
-    //       <SidebarProvider>
-    //         <AppSidebar />
-    //         <main>
-    //           <SidebarTrigger className="absolute" />
-    //           {children}
-    //         </main>
-    //         <Toaster />
-    //       </SidebarProvider>
-    //     </AuthProvider>
-    //   </body>
-    // </html>
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning
+      // className={`${ubuntu.className}`}
+    >
       <body className="antialiased">
-        <AuthProvider>
-          <SidebarProvider>
-            <ClientLayout>{children}</ClientLayout>
-            <SpeedInsights />
-          </SidebarProvider>
-        </AuthProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <AuthProvider>
+            <SidebarProvider>
+              <ClientLayout>{children}</ClientLayout>
+              <SpeedInsights />
+            </SidebarProvider>
+          </AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

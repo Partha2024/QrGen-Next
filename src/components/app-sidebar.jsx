@@ -22,6 +22,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "./ui/dropdown-menu";
+import { ModeToggle } from "@/components/theme-toggle";
 
 // Menu items.
 const items = [
@@ -95,6 +96,9 @@ export function AppSidebar({ ...props }) {
                 </DropdownMenuItem> */}
                 <DropdownMenuItem onClick={logout}>
                   <span>Sign out</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <ModeToggle/>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

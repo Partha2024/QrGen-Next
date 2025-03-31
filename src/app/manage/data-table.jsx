@@ -41,6 +41,7 @@ export function DataTable({ columns, data, onDelete }) {
   return (
     <>
       <div className="flex items-center py-4 justify-end pr-[15px]">
+        {/* <h1 className="manageDataTableHeader text-2xl font-semibold">All QR Codes</h1> */}
         <Input
           className="max-w-sm border-slate-600"
           placeholder="Search QR Codes"

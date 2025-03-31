@@ -27,7 +27,7 @@ export default function AuthProvider({ children }) {
         body: JSON.stringify({ username, password }),
       });
       if (!response.ok) {
-        throw new Error("Network response was not ok");
+        throw new Error("Network response was not okk");
       }
       const result = await response.json();
       console.log("result", result)
