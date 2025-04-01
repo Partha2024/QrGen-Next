@@ -66,9 +66,9 @@ export function DataTable({ columns, data, onDelete }) {
         <TableBody>
           {table.getRowModel().rows.length ? (
             table.getRowModel().rows.map((row, index) => (
-              <TableRow key={row.id} className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
+              <TableRow key={row.id} className={index % 2 === 0 ? 'bg-gray-100 dark:bg-gray-900' : 'bg-white dark:bg-black'}>
                 {row.getVisibleCells().map(cell => (
-                  <TableCell key={cell.id}>
+                  <TableCell key={cell.id} className="p-3">
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </TableCell>
                 ))}

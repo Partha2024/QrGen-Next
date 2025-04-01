@@ -26,9 +26,9 @@ export default function AuthProvider({ children }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password }),
       });
-      if (!response.ok) {
-        throw new Error("Network response was not okk");
-      }
+      // if (!response.ok) {
+      //   throw new Error("Network response was not okk");
+      // }
       const result = await response.json();
       console.log("result", result)
       if (result.token) {
@@ -37,22 +37,10 @@ export default function AuthProvider({ children }) {
         setUser({ username: result.user.username });
         router.push("/home");
       } else {
-        toast.error("Invalid Username or Password", {
-          style: {
-            color: '#e60000',
-            background: '#fff0f0',
-            borderColor: '#ffe0e1',
-          }
-        })
+        toast.error("Invalid Username or Password")
       }
     } catch (error) {
-      toast.error("Network Response Was Not Ok!!", {
-        style: {
-          color: '#e60000',
-          background: '#fff0f0',
-          borderColor: '#ffe0e1',
-        }
-      })
+      toast.error("Network Response Was Not Ok!!")
       console.error("Error validating user:", error);
     }
   };

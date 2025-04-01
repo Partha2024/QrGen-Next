@@ -250,22 +250,22 @@ function CreateQRComponent() {
           // console.log("QR Code generated:");
           toast.success("Success!!", {
             description: "QR Code Created Successfully",
-            style: {
-              color: '#008a2e',
-              background: '#ecfdf3',
-              borderColor: '#bffcd9',
-            },  
+            // style: {
+            //   color: '#008a2e',
+            //   background: '#ecfdf3',
+            //   borderColor: '#bffcd9',
+            // },  
           })
           window.location.href = "/edit?uid=" + uniqueId;
           setOnSubmitLoader(true);
         } else {
           setOnSubmitLoader(false);
           toast.error("Error Creating QR Code!!", {
-            style: {
-              color: '#e60000',
-              background: '#fff0f0',
-              borderColor: '#ffe0e1',
-            },
+            // style: {
+            //   color: '#e60000',
+            //   background: '#fff0f0',
+            //   borderColor: '#ffe0e1',
+            // },
           })
           console.error("Failed to generate QR code:", await response.text());
         }
