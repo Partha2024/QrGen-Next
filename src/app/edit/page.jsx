@@ -254,11 +254,11 @@ function EditQRComponent() {
       const response = await fetch(url);
       if (!response.ok) {
         toast.error("QR Code Not Found!!!", {
-          style: {
-            color: '#e60000',
-            background: '#fff0f0',
-            borderColor: '#ffe0e1',
-          },
+          // style: {
+          //   color: '#e60000',
+          //   background: '#fff0f0',
+          //   borderColor: '#ffe0e1',
+          // },
         })        
         throw new Error("Error fetching QR codes");
       }
@@ -378,20 +378,20 @@ function EditQRComponent() {
           setOnSubmitLoader(false);
           toast.success("Success!!", {
             description: "QR Code Updated Successfully",
-            style: {
-              color: '#008a2e',
-              background: '#ecfdf3',
-              borderColor: '#bffcd9',
-            },  
+            // style: {
+            //   color: '#008a2e',
+            //   background: '#ecfdf3',
+            //   borderColor: '#bffcd9',
+            // },  
           });
         } else {
           setOnSubmitLoader(true);
           toast.error("Failed to Update QR code!!!", {
-            style: {
-              color: '#e60000',
-              background: '#fff0f0',
-              borderColor: '#ffe0e1',
-            },
+            // style: {
+            //   color: '#e60000',
+            //   background: '#fff0f0',
+            //   borderColor: '#ffe0e1',
+            // },
           })
           console.error("Failed to Update QR code(F):", await response.text());
         }

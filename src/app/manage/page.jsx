@@ -27,13 +27,7 @@ function Manage() {
     try {
       const response = await fetch("./api/getQrData");
       if (!response.ok) {
-        toast.error("Network Response Was Not Ok", {
-          style: {
-            color: '#e60000',
-            background: '#fff0f0',
-            borderColor: '#ffe0e1',
-          },
-        })
+        toast.error("Network Response Was Not Ok")
         throw new Error("Network response was not ok");
       }
       const result = await response.json();
@@ -93,18 +87,10 @@ function Manage() {
     });
     toast.promise(myPromise, {
       loading:  "Deleting QR Code...",
-      // success: "QR Code Deleted Successfully" ,
       success: () => {
-        // setColor("#008a2e");
-        // setBackground("#ecfdf3");
-        // setBorderColor("#bffcd9")
         return "QR Code Deleted Successfully"
       },
-      // error: "Failed To Delete QR Code",
       error: () => {
-        // setColor("#e60000");
-        // setBackground("#fff0f0");
-        // setBorderColor("#ffe0e1");
         return "Failed To Delete QR Code"
       },
     });

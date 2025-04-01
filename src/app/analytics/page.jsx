@@ -97,15 +97,15 @@ const scanOSConfig = {
   },
   IOS: {
     label: "IOS",
-    color: "hsl(var(--chart-1))",
+    color: "hsl(var(--chart-2))",
   },
   Android: {
     label: "Android",
-    color: "hsl(var(--chart-2))",
+    color: "hsl(var(--chart-3))",
   },
   Windows: {
     label: "Windows",
-    color: "hsl(var(--chart-3))",
+    color: "hsl(var(--chart-2))",
   },
   Mac: {
     label: "Mac",
@@ -186,11 +186,11 @@ function Analytics() {
         setLoading(true);
         setLoadingError(true);
         toast.error("Network Response Was Not Ok!!", {
-          style: {
-            color: '#e60000',
-            background: '#fff0f0',
-            borderColor: '#ffe0e1',
-          },
+          // style: {
+          //   color: '#e60000',
+          //   background: '#fff0f0',
+          //   borderColor: '#ffe0e1',
+          // },
         })
         throw new Error("Network response was not ok");
       }
@@ -259,7 +259,7 @@ function Analytics() {
         return {
           operatingSystem: osName,
           totalScans: existingData ? existingData.count : 0,
-          fill: `hsl(var(--chart-${os}))`,
+          fill: `hsl(var(--chart-${os+1}))`,
         };
       });
       setScansByOS(scansByOSFormattedData);
@@ -314,7 +314,8 @@ function Analytics() {
       return
     }
 
-    toPng(ref.current, { cacheBust: true, backgroundColor: "#fff" })
+    const isDarkMode = document.documentElement.classList.contains("dark");
+    toPng(ref.current, { cacheBust: true, backgroundColor: isDarkMode ? 'black' : 'white' })
       .then((dataUrl) => {
         const link = document.createElement('a')
         link.download = 'Ananlytics.png'
@@ -339,19 +340,6 @@ function Analytics() {
   useEffect(() => {
     fetchData();
   }, []);
-
-  // var thisCard = document.getElementById("thisCard");
-  // useEffect(() => {
-  //   thisDivFunction();
-  // }, [thisCard]);
-  
-  // function thisDivFunction(){
-  //   if(thisCard){
-  //     setTimeout(() => {
-  //       thisCard.setAttribute("style", `height: ${thisCard.offsetHeight-45}px`);
-  //     },1000)
-  //   }
-  // }
 
   return (
     <>
