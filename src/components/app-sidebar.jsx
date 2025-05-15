@@ -101,9 +101,9 @@ export function AppSidebar({ ...props }) {
                   <ModeToggle/>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <!-- OneTrust Cookies Settings button start -->
+                  {/* <!-- OneTrust Cookies Settings button start --> */}
                   <button id="ot-sdk-btn" class="ot-sdk-show-settings">Cookie Settings</button>
-                  <!-- OneTrust Cookies Settings button end -->
+                  {/* <!-- OneTrust Cookies Settings button end --> */}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

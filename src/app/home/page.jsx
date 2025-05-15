@@ -32,9 +32,9 @@ export default function HomePage() {
             </em>
             SMS
           </Button>
-          <!-- OneTrust Cookies List start -->
+          {/* <!-- OneTrust Cookies List start --> */}
           <div id="ot-sdk-cookie-policy"></div>
-          <!-- OneTrust Cookies List end -->
+          {/* <!-- OneTrust Cookies List end --> */}
           {/* <Button variant="outline" className="options">
             <em>
               <MessageSquareMore />
