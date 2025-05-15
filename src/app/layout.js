@@ -29,6 +29,14 @@ export default function RootLayout({ children }) {
     <html lang="en" suppressHydrationWarning
       // className={`${ubuntu.className}`}
     >
+      <Head>
+        <!-- OneTrust Cookies Consent Notice start for qrgen-prod.vercel.app -->
+        <script src="https://cdn.cookielaw.org/scripttemplates/otSDKStub.js"  type="text/javascript" charset="UTF-8" data-domain-script="0196d3bf-f3e6-7674-a3b9-e63968118774" ></script>
+        <script type="text/javascript">
+        function OptanonWrapper() { }
+        </script>
+        <!-- OneTrust Cookies Consent Notice end for qrgen-prod.vercel.app -->
+      </Head>
       <body className="antialiased">
         <ThemeProvider
           attribute="class"
