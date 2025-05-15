@@ -31,6 +31,7 @@ export default function RootLayout({ children }) {
     >
       <head>
         {/* OneTrust Cookies Consent Notice start */}
+        {/* eslint-disable-next-line @next/next/no-sync-scripts */}
         <script
           src="https://cdn.cookielaw.org/scripttemplates/otSDKStub.js"
           type="text/javascript"
