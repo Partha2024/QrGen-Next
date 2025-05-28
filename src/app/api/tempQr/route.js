@@ -56,7 +56,7 @@ export async function POST(req, { params }) {
               scan_country,
               scan_state,
               scan_city,
-              scan_ip_address: ip,
+              scan_ip_hash: ip,
               scan_os,
             },
           });

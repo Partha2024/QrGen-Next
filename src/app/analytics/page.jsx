@@ -735,7 +735,7 @@ function Analytics() {
                           <Bar
                             dataKey="scans"
                             fill="var(--color-scans)"
-                            radius={5}
+                            radius={4}
                           >
                             <LabelList
                               position="right"
@@ -787,7 +787,7 @@ function Analytics() {
                           <Bar
                             dataKey="unique_users"
                             fill="var(--color-unique_users)"
-                            radius={5}
+                            radius={4}
 
                           >
                             <LabelList
@@ -815,7 +815,7 @@ function Analytics() {
                         <LoaderCircle className="loadingSpinner mx-auto w-6" />
                       ) : (
 
-                        <BarChart
+                      <BarChart
                         accessibilityLayer
                         data={scanByTimeOfDay}
                         margin={{
@@ -830,6 +830,7 @@ function Analytics() {
                           axisLine={false}
                           tickFormatter={(value) => value.slice(0, 3)}
                         />
+                        <YAxis type="number" dataKey="timeOfDay" />
                         <ChartTooltip
                           cursor={false}
                           content={<ChartTooltipContent hideLabel />}
@@ -837,7 +838,7 @@ function Analytics() {
                         <Bar
                           dataKey="totalScans"
                           fill="var(--color-totalScans)"
-                          radius={5}
+                          radius={4}
                         >
                           {/* <LabelList
                             position="top"
@@ -887,7 +888,7 @@ function Analytics() {
                           <Bar
                             dataKey="totalScans"
                             fill="var(--color-totalScans)"
-                            radius={5}
+                            radius={4}
                             >
                             <LabelList
                               position="right"
@@ -938,7 +939,7 @@ function Analytics() {
                           cursor={false}
                           content={<ChartTooltipContent hideLabel />}
                           />
-                        <Bar dataKey="totalScans" layout="vertical" radius={5}>
+                        <Bar dataKey="totalScans" layout="vertical" radius={4}>
                           <LabelList
                             position="right"
                             offset={12}
