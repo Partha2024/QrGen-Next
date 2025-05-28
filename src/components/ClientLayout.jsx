@@ -13,7 +13,7 @@ export default function ClientLayout({ children }) {
     <>
       {user && <AppSidebar />}
       <main>
-        {user && <SidebarTrigger className="absolute" />}
+        {user && (<><SidebarTrigger className="absolute md:hidden" /><h1 className="font-bold ml-6 md:hidden">QRGen</h1></>)}
         {children}
       </main>
       <Toaster richColors />

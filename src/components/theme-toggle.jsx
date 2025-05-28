@@ -11,7 +11,7 @@ export function ModeToggle() {
 
   return (
     <Button className="h-5 w-full font-normal justify-start" variant="ghost" size="icon"
-      onClick={() => setTheme(theme === "light" ? "dark" : "light")}>
+      onClick={() => setTheme(theme === "light" ? "light" : "dark")}>
       Toggle theme
       <Sun className="h-[1.5rem] w-[1.3rem] dark:hidden" />
       <Moon className="hidden h-5 w-5 dark:block" />
