@@ -242,7 +242,7 @@ let cache = {};
 let lastFetched = 0;
 const CACHE_DURATION = 5 * 60 * 1000; // Cache for 5 minutes
 
-const useCache = () => {
+const isCache = () => {
   return Date.now() - lastFetched < CACHE_DURATION;
 };
 
@@ -278,7 +278,7 @@ export async function POST(req) {
     if (city) whereConditions_q += ` AND scan_city = '${city}'`;
 
     // Use cache if available
-    if (useCache()) {
+    if (isCache()) {
       return NextResponse.json(cache);
     }
 
@@ -413,7 +413,7 @@ export async function POST(req) {
       })),
     };
     // Cache the data if not cached
-    if (!useCache()) {
+    if (!isCache()) {
       cache = { ...response };
       lastFetched = Date.now();
     }
